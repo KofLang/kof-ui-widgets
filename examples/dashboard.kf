@@ -5,7 +5,7 @@
 main() {
     var w = App("Dashboard")
 
-    Int nav = Navbar(listOf("visão", "vendas", "estoque"))
+    var nav = Navbar(listOf("visão", "vendas", "estoque"))
     Int crumb = Breadcrumbs(listOf("kof", "dashboard", "agosto"))
 
     var downloads = StatCard("downloads", "12.4k", "+8%")
@@ -38,7 +38,7 @@ main() {
     Int metaRow = Row(listOf(metaGauge, metaDonut))
     Int progresso = Text(progressBar(29, 41))
     w.bind(Column(listOf(
-        nav,
+        nav.root(),
         crumb,
         cardsRow,
         chartCol,

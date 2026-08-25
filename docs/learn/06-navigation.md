@@ -10,12 +10,11 @@ do corpo.
 
 ```kof
 Tabs(List<String> titles, List<String> pages): TabParts  // .root(), até 4 abas
-activeTab(): Int
 tabBody(titles, pages, index): String                    // pura
 ```
 
-Strip de botões + corpo `▸ título\n\nconteúdo`. Clicar grava o índice em
-`TabState.active` e rebinda o corpo.
+Strip de botões + corpo `▸ título\n\nconteúdo`. A aba ativa é estado local
+da instância (captura box) — cada Tabs na tela vive sua vida.
 
 ## Accordion
 
@@ -25,7 +24,7 @@ accordionBody(content, open): String                     // pura: "" quando fech
 accordionMark(open): String                              // pura: ▾ / ▸
 ```
 
-O marcador ▾/▸ é irmão do botão e gira junto com `SectionOpen.open`.
+O marcador ▾/▸ é irmão do botão e gira junto com o estado local da instância.
 
 ## Pagination
 

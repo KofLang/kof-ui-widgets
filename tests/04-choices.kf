@@ -1,4 +1,4 @@
-// 04-choices — transições puras + defaults de estado.
+// 04-choices — transições puras + construção por instância.
 
 test "flip alterna" {
     assert(flip(true) == false, "true vira false")
@@ -14,29 +14,28 @@ test "ratingFace desenha estrelas" {
     assert(ratingFace(9) == "★★★", "teto em três")
 }
 
-test "setStars é toggle monotônico" {
-    // RatingState.stars começa em 0
-    assert(setStars(1) == 1, "sobe para 1")
-    assert(setStars(1) == 0, "mesma estrela zera")
-    assert(setStars(3) == 3, "sobe para 3")
+test "toggleStars: mesma nota zera" {
+    assert(toggleStars(0, 1) == 1, "sobe para 1")
+    assert(toggleStars(1, 1) == 0, "mesma estrela zera")
+    assert(toggleStars(1, 3) == 3, "troca direta")
+    assert(toggleStars(3, 3) == 0, "teto zerável")
 }
 
-test "estado inicial dos componentes" {
-    assert(isChecked() == false, "checkbox inicia off")
-    assert(isSwitchOn() == false, "switch inicia off")
-    assert(radioSelected() == -1, "radio sem seleção")
-    assert(ratingStars() >= 0, "rating não-negativo")
+test "radioSelected começa sem seleção" {
+    assert(radioSelected() == -1, "espelho inicial é -1")
 }
 
-test "componentes constroem" {
+test "cada instância constrói independente" {
     var w = Window("choices")
-    Int c = Checkbox("notificações")
-    Int s = ToggleSwitch("som")
-    Int r1 = RadioGroup(listOf("pequeno"))
-    Int r4 = RadioGroup(listOf("a", "b", "c", "d"))
-    Int rt = Rating("kof")
-    w.bind(c)
-    w.bind(s)
+    Int c1 = Checkbox("primeira").root()
+    Int c2 = Checkbox("segunda").root()
+    Int sw = ToggleSwitch("som").root()
+    Int r1 = RadioGroup(listOf("pequeno")).root()
+    Int r4 = RadioGroup(listOf("a", "b", "c", "d")).root()
+    Int rt = Rating("kof").root()
+    w.bind(c1)
+    w.bind(c2)
+    w.bind(sw)
     w.bind(r1)
     w.bind(r4)
     w.bind(rt)

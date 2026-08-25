@@ -13,6 +13,8 @@ record AvatarParts(Int root)
 DataTable(String headersCsv, List<String> rows): Int {
     var l = Label(tableText(headersCsv, rows))
     l.color = Palette.white
+    Int f = Font("monospace", 13)
+    l.setFont(f)
     Int h = l
     return h
 }

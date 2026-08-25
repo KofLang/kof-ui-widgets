@@ -1,68 +1,69 @@
 # 01 — Padrões: estado interativo sem framework
 
 UI interativa tem um problema clássico: quem responde ao clique precisa ver
-o mundo que mudou. No Kof a resposta é uma convenção só, herdada do
-`kof.ui` — a biblioteca não inventa nada aqui, apenas aplica e documenta.
+o mundo que mudou. No Kof a resposta é uma convenção só — e desde o update
+do `kof.time`, a captura ficou mais forte.
 
-## As três regras
+## As regras de captura (atuais)
 
-1. **Lambdas capturam cópias somente-leitura.** A foto do valor no momento
-   da criação.
-2. **Estado mutável entre cliques vive em campos estáticos de classe.**
-   A lambda lê/escreve o campo, nunca a cópia.
-3. **Handles TIPADOS criados antes da lambda podem ser rebindados à
-   vontade.** `label.setText(...)`, `lista.bind(...)`, `input.text()` dentro
-   da ação — é o padrão do contador de `learn/35-kof-ui.md`.
-
-Cópias `Int` servem apenas para montar listas de layout:
-
-```kof
-var resumo = Text(progressBar(0, 0))     // TIPADO: rebindável
-Int resumoH = resumo                      // Int: só para listOf(...)
-
-var btn = Button("ok", () -> {
-    Contagem.total = Contagem.total + 1           // estático
-    resumo.setText(str(Contagem.total))           // typed capture
-})
-```
+1. **Variáveis externas apenas LIDAS dentro da lambda** continuam sendo
+   fotos somente-leitura — handles de widget criados antes da ação caem
+   aqui: `mark.setText(...)`, `lista.bind(...)`, `input.text()` funcionam
+   porque o handle é estável.
+2. **Variáveis externas ESCRITAS dentro da lambda viram box mutável**
+   (captura por referência): a ação escreve, o escopo de fora lê o valor
+   atualizado — é o mecanismo que faz `time.interval` contar ticks no E2E
+   do compilador.
+3. **Estado que precisa ser lido por OUTRA função** continua em campo
+   estático de classe, como espelho documentado.
 
 ## O esqueleto de todo componente interativo
 
-Cada componente da biblioteca segue a mesma anatomia:
-
 ```kof
-class XState {                 // 1. estado: estático e pequeno
-    static Bool on = false
-}
+record XParts(Int root)
 
-record XParts(Int root)        // 2. partes expostas como handles Int
-
-X(String label): XParts {      // 3. construtor monta TUDO no próprio escopo
-    var mark = Label(marca())             // irmão criado ANTES da ação
-    var b = Button(label, () -> {
-        XState.on = flip(XState.on)       // 4. transição PURA...
-        mark.setText(marca())             // ...e rebind do irmão
+X(String label): XParts {
+    var on = false                 // BOXADO: escrito dentro da ação...
+    var mark = Label(marca())      // irmão criado ANTES (captura estável)
+    var btn = Button(label, () -> {
+        on = flip(on)              // ...e por isso cada instância tem o seu
+        mark.setText(marca(on))
     })
     ...
 }
 
-flip(Bool v): Bool { ... }     // 5. a lógica mora em função pura testável
+flip(Bool v): Bool { ... }         // a lógica mora em função pura testável
 ```
 
-A lambda é cola; a lógica é pura. Por isso a suíte consegue afirmar valores
-exatos (`nextPage(1,10) == 2`) sem abrir janela nenhuma.
+Consequência direta: **cada Checkbox/Tabs/Accordion/Rating tem estado
+próprio** — dois checkboxes na mesma tela não brigam mais pelo mesmo Bool.
 
-## Limitação alpha: uma instância por tipo
+## Espelhos estáticos (onde o app precisa ler)
 
-`CheckboxState.on` é único: dois `Checkbox` compartilham o estado. Para
-componentes independentes, aplique o esqueleto acima com a SUA classe de
-estado — dez linhas, zero mágica. Quando a plataforma permitir registrar
-estado por handle, os componentes migram sem mudar a API.
+Quando a lógica do app depende da escolha, a ação escreve também num
+estático nomeado, e a biblioteca documenta o contrato:
+
+| Espelho | Contrato |
+|---------|----------|
+| `RadioMirror.lastSelected` | índice da última opção marcada (-1 = nenhuma) |
+| `PageState.page` | página atual do Pagination |
+| `NavState.route` | rota ativa do Navbar |
+| `SearchState.query / .matches` | última busca executada |
+| `TextFieldState.value` | valor sincronizado pelo ↻ |
+
+O espelho reflete **a última instância interagida** — o visual nunca
+depende dele.
+
+## O que continua impossível
+
+Vincular ação DEPOIS de criar o handle (self-capture na inicialização)
+segue sem suporte — nenhum componente atualiza o texto do próprio botão;
+todos usam irmão rebindável. Ver [`gaps.md`](../gaps.md), UIW001.
 
 ## Anti-padrões
 
-- **Estado duplicado**: contador num campo estático E no texto do label. O
-  texto deriva: recalcule na transição.
-- **Sentinelas**: `-1` "sem valor" espalhado; se a ausência importa,
-  nomeie (`radioSelected() == -1` é contrato documentado de RadioGroup).
+- **Estado duplicado**: contador num box E no texto do label sem fonte da
+  verdade. O texto deriva da transição pura.
+- **Sentinelas não documentadas**: `-1` só existe onde é contrato
+  (`RadioMirror.lastSelected`).
 - **Mecanismo na tela**: ids de DOM/CSS/hex dentro do handler de clique.

@@ -43,7 +43,7 @@ Os scripts usam o `kof` do `PATH`; para outro binário:
 ```
 kof-ui-widgets/
 ├── README.md               # visão geral e quick start
-├── VERSION                 # 0.2.0-alpha (convenção do Kof)
+├── VERSION                 # 0.3.0-alpha (convenção do Kof)
 ├── LICENSE                 # BSD 3-Clause
 ├── src/                    # a biblioteca: uma família por arquivo
 │   ├── 00-core.kf          #   App, cores, helpers puros

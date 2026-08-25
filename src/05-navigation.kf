@@ -6,54 +6,46 @@
 
 // ---- Tabs ------------------------------------------------------------------------
 
-class TabState {
-    static Int active = 0
-}
-
 record TabParts(Int root)
 
 Tabs(List<String> titles, List<String> pages): TabParts {
     var theme = Theme.dark()
+    var active = 0
     var body = Label(tabBody(titles, pages, 0))
 
     var b0 = Button(titles.get(0), () -> {
-        TabState.active = 0
+        active = 0
         body.setText(tabBody(titles, pages, 0))
     })
     var items = listOf(b0)
     if (titles.size > 1) {
         var b1 = Button(titles.get(1), () -> {
-            TabState.active = 1
+            active = 1
             body.setText(tabBody(titles, pages, 1))
         })
         items.add(b1)
     }
     if (titles.size > 2) {
         var b2 = Button(titles.get(2), () -> {
-            TabState.active = 2
+            active = 2
             body.setText(tabBody(titles, pages, 2))
         })
         items.add(b2)
     }
     if (titles.size > 3) {
         var b3 = Button(titles.get(3), () -> {
-            TabState.active = 3
+            active = 3
             body.setText(tabBody(titles, pages, 3))
         })
         items.add(b3)
     }
 
     Int stripH = Row(items)
-    var strip = stripH
     var box = View(Style(theme.surface(), Palette.white, 12, 8))
-    box.bind(strip)
+    box.bind(stripH)
     box.bind(body)
     Int bh = box
     return TabParts(bh)
-}
-
-activeTab(): Int {
-    return clamp(TabState.active, 0, 2147483647)
 }
 
 // transição pura: corpo = "▸ título\n\nconteúdo".
@@ -71,20 +63,17 @@ tabBody(List<String> titles, List<String> pages, Int index): String {
 
 // ---- Accordion ----------------------------------------------------------------------
 
-class SectionOpen {
-    static Bool open = true
-}
-
 record AccordionParts(Int root)
 
 Accordion(String title, String content): AccordionParts {
     var theme = Theme.dark()
-    var mark = Label(accordionMark(SectionOpen.open))
-    var body = Label(accordionBody(content, SectionOpen.open))
+    var open = true
+    var mark = Label(accordionMark(true))
+    var body = Label(accordionBody(content, true))
     var btn = Button(title, () -> {
-        SectionOpen.open = flip(SectionOpen.open)
-        mark.setText(accordionMark(SectionOpen.open))
-        body.setText(accordionBody(content, SectionOpen.open))
+        open = flip(open)
+        mark.setText(accordionMark(open))
+        body.setText(accordionBody(content, open))
     })
     Int mh = mark
     Int bh2 = btn

@@ -32,7 +32,7 @@ Onze módulos, ~50 intenções cobrindo o ciclo completo de uma UI de app:
 | [tipografia + layout](docs/learn/03-typography-layout.md) | `Heading..Quote`, `Section/Panel/Card`, `VSpace/HSpace/Divider` |
 | marcadores | `Badge`, `Tag`, `Chip` |
 | [formulários](docs/learn/04-forms.md) | `TextField`, validação pura (`isEmail`, `validationSummary`) |
-| [escolhas](docs/learn/05-choices.md) | `Checkbox`, `ToggleSwitch`, `RadioGroup`, `Rating` |
+| [escolhas](docs/learn/05-choices.md) | `Checkbox`, `ToggleSwitch`, `RadioGroup`, `Rating` — estado por instância |
 | [navegação](docs/learn/06-navigation.md) | `Tabs`, `Accordion`, `Pagination`, `Navbar`, `Breadcrumbs`, `SearchBox` |
 | [overlays](docs/learn/07-overlays.md) | `Dialog`, `Confirm`, `Drawer`, `Tooltip`, `Toast`, `Alert` |
 | [dados](docs/learn/08-data.md) | `DataTable`, `TreeView`, `ListView`, `Timeline`, `StatCard`, `Avatar`, `Empty` |
@@ -106,7 +106,7 @@ scripts/run-example.sh dashboard   # stat cards + charts + tabela + navbar
 Anatomia única, herdada do padrão do contador do `kof.ui`
 ([docs/learn/01-patterns.md](docs/learn/01-patterns.md)):
 
-1. **estado estático pequeno** (`CheckboxState.on`)
+1. **estado local boxado** — captura por referência: cada instância tem o seu
 2. **record de partes** expondo handles (`CheckboxParts.root()`)
 3. **construtor** monta tudo no próprio escopo (irmão criado antes da ação)
 4. **lambda é cola**; **a lógica mora em função pura**
@@ -127,7 +127,8 @@ kof run "$OUT" --target=js
 ```
 
 Detalhes e estrutura: [`docs/install.md`](docs/install.md).
-Requisito: distribuição Kof ≥ 0.0.14-alpha.
+Requisito: distribuição Kof com `Link/Image/Icon/Font` e captura box
+(agosto/2026+; recomendada a mais recente).
 
 ---
 

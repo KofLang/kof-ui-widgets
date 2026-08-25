@@ -6,6 +6,13 @@ valores. `Int` de widget atravessa funções livremente; operações de membro
 (`.setText`, `.bind`) só no escopo criador — ver
 [learn/01-patterns](learn/01-patterns.md).
 
+## Primitivos da plataforma usados/integrados
+
+Desde o update do Kof: `Link(text, url)`, `Image(src)`, `Icon(name[, size])`
+e `Font(family, size[, bold])` + `.setFont(font)` em Label/Button/Input/
+View/Link. A biblioteca integra Font (`Code`, `DataTable` em monospace);
+Link é plataforma pura — não duplicamos intenção que já existe.
+
 ## 00-core
 
 | Assinatura | Devolve |
@@ -44,17 +51,17 @@ valores. `Int` de widget atravessa funções livremente; operações de membro
 
 | Assinatura | Devolve |
 |------------|---------|
-| `Checkbox(label)` / `isChecked()` | CheckboxParts / Bool |
-| `ToggleSwitch(label)` / `isSwitchOn()` | SwitchParts / Bool |
-| `RadioGroup(options ≤4)` / `radioSelected()` | RadioParts / Int (-1 inicial) |
-| `Rating(subject)` / `ratingStars()` | RatingParts / Int |
-| `flip(v) / setStars(n) / ratingFace(stars)` | puras |
+| `Checkbox(label)` | CheckboxParts (estado por instância) |
+| `ToggleSwitch(label)` | SwitchParts (estado por instância) |
+| `RadioGroup(options ≤4)` / `radioSelected()` | RadioParts / Int (espelho `RadioMirror.lastSelected`) |
+| `Rating(subject)` | RatingParts (estado por instância) |
+| `flip(v) / toggleStars(current, target) / ratingFace(stars)` | puras |
 
 ## 05-navigation
 
 | Assinatura | Devolve |
 |------------|---------|
-| `Tabs(titles, pages ≤4)` / `activeTab()` | TabParts / Int |
+| `Tabs(titles, pages ≤4)` | TabParts (aba ativa por instância) |
 | `Accordion(title, content)` | AccordionParts |
 | `Pagination(total)` / `nextPage(p,t) / prevPage(p,t) / pagerLabel(p,t)` | PagerParts / puras |
 | `Breadcrumbs(parts)` | Int (Label) |

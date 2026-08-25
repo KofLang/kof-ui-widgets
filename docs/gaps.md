@@ -14,8 +14,8 @@ com código de gap — nunca fingido na API.
 | UIW005 | drag-and-drop (pointer events) | kanban, reorder, sliders arrastáveis | botões ± como controles |
 | UIW006 | seleção múltipla de arquivos / file dialog nativo | upload real | FilePicker por caminho (kof.io) |
 | UIW007 | editor multilinha (textarea) | code editor, terminal interativo | Input de linha + preview somente-leitura |
-| UIW008 | timer/animation frame | toast auto-dismiss, spinner animado, skeleton shimmer | ✕ manual; frames estáticos via transições |
-| UIW010 | Button sem cor/ícone próprios | botões semânticos visuais | prefixos de texto (✓, ✕) nos labels |
+| UIW008 | timer só na JVM (`time.*` reporta TIME001 fora dela — e é onde não há render) | animar a UI no alvo JS | ✕ manual no JS; interval disponível para lógica JVM headless |
+| UIW010 | Button sem cor/ícone embutidos | botões semânticos visuais | prefixos de texto (✓, ✕); `Icon(name)` da plataforma ao lado do botão |
 | UIW020 | `now()` Long sem conversão Long→Int nem formatação | relógio ao vivo, datas absolutas | Calendar/DatePicker relativos e puros |
 | UIW030 | canvas/SVG | charts proporcionais | família charts em texto monoespaçado |
 | UIW031 | kof.io no alvo JS | FilePicker carregar no browser | funciona JVM/Native; JS reporta no preview |

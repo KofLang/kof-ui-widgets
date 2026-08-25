@@ -22,7 +22,7 @@ test "filePreview vazio" {
 
 test "FilePicker constrói" {
     var w = Window("arquivos")
-    Int fp = FilePicker("abrir log")
+    var fp = FilePicker("abrir log")
     w.bind(fp.root())
 }
 

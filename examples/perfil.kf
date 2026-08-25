@@ -11,7 +11,7 @@ main() {
 
     var campoNome = TextField("Nome", "como te chamam?")
     var emailCheck = Checkbox("mostrar email público")
-    Int notif = ToggleSwitch("notificações")
+    var notif = ToggleSwitch("notificações")
     var plano = RadioGroup(listOf("free", "pro", "enterprise"))
     var nota = Rating("experiência até agora")
     Int salvar = Button("salvar", () -> {
@@ -24,7 +24,7 @@ main() {
         AvatarRow(),
         campoNome.root(),
         emailCheck.root(),
-        notif,
+        notif.root(),
         plano.root(),
         nota.root(),
         Alert("info", "alterações só saem quando você salvar"),
@@ -34,7 +34,7 @@ main() {
 }
 
 AvatarRow(): Int {
-    Int avatar = Avatar("mel silva")
+    Int avatar = Avatar("mel silva").root()
     Int name = Subheading("mel")
     Int handle = Muted("@mel")
     Int ids = Column(listOf(name, handle))

@@ -1,27 +1,25 @@
 // 04-choices.kf — checkbox, toggle-switch, radio group e rating.
 //
 // Padrão de componente interativo da biblioteca:
-//   record de partes + estado estático + transições puras testáveis.
-// A lambda só cola: chama a transição pura e rebinda o irmão capturado
-// (criado antes da lambda — nunca o próprio botão).
+//   estado local BOXADO (captura por referência desde o update do
+//   kof.time/interval) + transições puras testáveis + rebind de irmão
+//   capturado. Cada instância tem estado PRÓPRIO e independente.
 //
-// Multi-instância: cada componente compartilha o estado estático do seu
-// tipo (limite alpha documentado em docs/learn/01-patterns.md).
+// Espelhos estáticos: onde o app precisa LER a escolha (radio, paginação,
+// busca), a ação escreve também num estático documentado — ele reflete a
+// última instância interagida. O visual, porém, nunca depende dele.
 
 // ---- Checkbox -----------------------------------------------------------------
-
-class CheckboxState {
-    static Bool on = false
-}
 
 record CheckboxParts(Int root)
 
 Checkbox(String label): CheckboxParts {
     var theme = Theme.dark()
+    var on = false
     var mark = Label("[ ]")
     var btn = Button(label, () -> {
-        CheckboxState.on = !CheckboxState.on
-        if (CheckboxState.on) {
+        on = flip(on)
+        if (on) {
             mark.setText("[x] " + label)
         } else {
             mark.setText("[ ] " + label)
@@ -32,12 +30,8 @@ Checkbox(String label): CheckboxParts {
     var col = Column(listOf(m, b))
     var box = View(Style(theme.surface(), Palette.white, 8, 8))
     box.bind(col)
-    Int bh = box
-    return CheckboxParts(bh)
-}
-
-isChecked(): Bool {
-    return CheckboxState.on
+    Int root = box
+    return CheckboxParts(root)
 }
 
 // transição pura (testável): alterna.
@@ -50,18 +44,15 @@ flip(Bool v): Bool {
 
 // ---- Toggle switch --------------------------------------------------------------
 
-class SwitchState {
-    static Bool on = false
-}
-
 record SwitchParts(Int root)
 
 ToggleSwitch(String label): SwitchParts {
     var theme = Theme.dark()
+    var on = false
     var knob = Label("○ off")
     var btn = Button(label, () -> {
-        SwitchState.on = flip(SwitchState.on)
-        if (SwitchState.on) {
+        on = flip(on)
+        if (on) {
             knob.setText("● on")
         } else {
             knob.setText("○ off")
@@ -72,49 +63,50 @@ ToggleSwitch(String label): SwitchParts {
     var row = Row(listOf(k, b))
     var box = View(Style(theme.surface(), Palette.white, 8, 8))
     box.bind(row)
-    Int bh = box
-    return SwitchParts(bh)
-}
-
-isSwitchOn(): Bool {
-    return SwitchState.on
+    Int root = box
+    return SwitchParts(root)
 }
 
 // ---- Radio group ----------------------------------------------------------------
 
-class RadioState {
-    static Int selected = -1
+class RadioMirror {
+    static Int lastSelected = -1
 }
 
 record RadioParts(Int root)
 
 RadioGroup(List<String> options): RadioParts {
     var theme = Theme.dark()
+    var selected = -1
     var choice = Label("nenhuma opção")
 
     // até 4 opções, sem loop: cada botão captura a própria cópia do índice
     var b0 = Button(options.get(0), () -> {
-        RadioState.selected = 0
+        selected = 0
+        RadioMirror.lastSelected = 0
         choice.setText("> " + options.get(0))
     })
     var items = listOf(b0)
     if (options.size > 1) {
         var b1 = Button(options.get(1), () -> {
-            RadioState.selected = 1
+            selected = 1
+            RadioMirror.lastSelected = 1
             choice.setText("> " + options.get(1))
         })
         items.add(b1)
     }
     if (options.size > 2) {
         var b2 = Button(options.get(2), () -> {
-            RadioState.selected = 2
+            selected = 2
+            RadioMirror.lastSelected = 2
             choice.setText("> " + options.get(2))
         })
         items.add(b2)
     }
     if (options.size > 3) {
         var b3 = Button(options.get(3), () -> {
-            RadioState.selected = 3
+            selected = 3
+            RadioMirror.lastSelected = 3
             choice.setText("> " + options.get(3))
         })
         items.add(b3)
@@ -129,36 +121,34 @@ RadioGroup(List<String> options): RadioParts {
     }
     var box = View(Style(theme.surface(), Palette.white, 8, 8))
     box.bind(col)
-    Int bh = box
-    return RadioParts(bh)
+    Int root = box
+    return RadioParts(root)
 }
 
+// espelho da última seleção (qualquer grupo) para lógica do app.
 radioSelected(): Int {
-    return RadioState.selected
+    return RadioMirror.lastSelected
 }
 
 // ---- Rating -----------------------------------------------------------------------
-
-class RatingState {
-    static Int stars = 0
-}
 
 record RatingParts(Int root)
 
 Rating(String subject): RatingParts {
     var theme = Theme.dark()
-    var face = Label(ratingFace(RatingState.stars))
+    var stars = 0
+    var face = Label(ratingFace(0))
     var b1 = Button("★", () -> {
-        RatingState.stars = setStars(1)
-        face.setText(ratingFace(RatingState.stars))
+        stars = toggleStars(stars, 1)
+        face.setText(ratingFace(stars))
     })
     var b2 = Button("★★", () -> {
-        RatingState.stars = setStars(2)
-        face.setText(ratingFace(RatingState.stars))
+        stars = toggleStars(stars, 2)
+        face.setText(ratingFace(stars))
     })
     var b3 = Button("★★★", () -> {
-        RatingState.stars = setStars(3)
-        face.setText(ratingFace(RatingState.stars))
+        stars = toggleStars(stars, 3)
+        face.setText(ratingFace(stars))
     })
     Int f = face
     Int r1 = b1
@@ -169,20 +159,16 @@ Rating(String subject): RatingParts {
     var col = Column(listOf(f, strip, sub))
     var box = View(Style(theme.surface(), Palette.white, 8, 8))
     box.bind(col)
-    Int bh = box
-    return RatingParts(bh)
+    Int root = box
+    return RatingParts(root)
 }
 
-ratingStars(): Int {
-    return RatingState.stars
-}
-
-// transição pura: estrelas são monotônicas (clique baixo reduz).
-setStars(Int n): Int {
-    if (n == RatingState.stars) {
+// transição pura: clicar na nota já dada volta a zero.
+toggleStars(Int current, Int target): Int {
+    if (current == target) {
         return 0
     }
-    return n
+    return target
 }
 
 ratingFace(Int stars): String {
