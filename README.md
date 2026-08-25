@@ -2,46 +2,49 @@
 
 ### Widgets de intenção para o kof.ui
 
-**Você escreve o que quer na tela. A biblioteca decide o como.**
+**Você escreve o que quer na tela. A biblioteca decide o como — e os testes
+provam o como antes de qualquer pixel existir.**
 
 ---
 
 > O programador deve escrever a intenção.
-> A linguagem — e a biblioteca — cuidam da complexidade.
-
-`kof-ui-widgets` é uma biblioteca de widgets para o
-[`kof.ui`](https://github.com/KofLang/Kof4j/blob/main/learn/35-kof-ui.md)
-construída sobre uma regra só: **cada widget é uma intenção com nome**.
+> A linguagem, a biblioteca e as transições puras cuidam da complexidade.
 
 ```text
-"agrupe isto num cartão"  → Card("Perfil")   → View + Style + Heading
-"texto secundário"        → Muted("dica")    → Label + gray + 13px
-"abra o app"              → App("Tarefas")   → Window + size + Theme.dark()
+"agrupe isto num cartão"  → Card("Perfil")      → View + Style + Heading
+"próxima página"          → nextPage(1, 10)     → transição pura testável
+"mostre estes dados"      → DataTable(...)      → colunas dimensionadas
+"o que é isso?"           → Tooltip("kof", ...) → janela oculta sob clique
 ```
 
 Sem CSS, sem ids de DOM, sem builder, sem framework. Source Kof puro
-compondo os primitivos que você já tem.
+compondo os primitivos do [`kof.ui`](https://github.com/KofLang/Kof4j/blob/main/learn/35-kof-ui.md).
 
 ---
 
 # O que é
 
-Um único arquivo (`src/kof-ui-widgets.kf`) com oito intenções:
+Onze módulos, ~50 intenções cobrindo o ciclo completo de uma UI de app:
 
-| Widget | Intenção | Devolve |
-|--------|----------|---------|
-| `App(title)` | "abra o app" — janela pronta, tema do Kof | handle de Window |
-| `Heading(text)` | título de seção (26px bold) | handle de Label |
-| `Text(text)` | texto corrente | handle de Label |
-| `Muted(text)` | texto secundário (13px gray) | handle de Label |
-| `Card(title)` | agrupar conteúdo num painel | handle de View |
-| `Badge(text)` | marcador curto de status/tag | handle de View |
-| `Field(caption, input)` | campo com legenda | handle de Column |
-| `progressBar(value, max)` | barra de avanço (função pura) | String |
+| Família | Destaques |
+|---------|-----------|
+| [core](docs/learn/02-core.md) | `App`, cores semânticas, `repeat/pad/ellipsis/clamp/wrap/str` |
+| [tipografia + layout](docs/learn/03-typography-layout.md) | `Heading..Quote`, `Section/Panel/Card`, `VSpace/HSpace/Divider` |
+| marcadores | `Badge`, `Tag`, `Chip` |
+| [formulários](docs/learn/04-forms.md) | `TextField`, validação pura (`isEmail`, `validationSummary`) |
+| [escolhas](docs/learn/05-choices.md) | `Checkbox`, `ToggleSwitch`, `RadioGroup`, `Rating` |
+| [navegação](docs/learn/06-navigation.md) | `Tabs`, `Accordion`, `Pagination`, `Navbar`, `Breadcrumbs`, `SearchBox` |
+| [overlays](docs/learn/07-overlays.md) | `Dialog`, `Confirm`, `Drawer`, `Tooltip`, `Toast`, `Alert` |
+| [dados](docs/learn/08-data.md) | `DataTable`, `TreeView`, `ListView`, `Timeline`, `StatCard`, `Avatar`, `Empty` |
+| [data/hora](docs/learn/09-datetime.md) | `Calendar`, `DatePicker`, `TimePicker` (Sakamoto puro, ancorado em datas históricas) |
+| [gráficos](docs/learn/10-charts.md) | `Sparkline`, `BarsChart`, `Donut`, `Gauge`, `HBar`, `progressBar` |
+| [arquivos](docs/learn/11-io.md) | `FilePicker` com preview via kof.io |
 
 Os primitivos (`Window`, `Label`, `Button`, `Input`, `Column`, `Row`,
 `View`, `Style`) continuam todos disponíveis — a biblioteca não esconde o
 core; sobe o nível quando o core já não expressa a intenção direto.
+
+Referência única de assinaturas: [`docs/reference/api.md`](docs/reference/api.md).
 
 ---
 
@@ -58,46 +61,73 @@ main() {
     var w = App("Tarefas")
 
     var resumo = Text(progressBar(0, 0))
+    var lista = Column(listOf<String>())
     var campo = Input("o que precisa ser feito?")
+    Int resumoH = resumo
+    Int campoH = campo
+
+    var addBtn = Button("+ adicionar", () -> {
+        if (!isBlank(campo.text())) {
+            Estado.total = Estado.total + 1
+            lista.bind(Text("[ ] " + campo.text()))
+            resumo.setText(progressBar(Estado.feitas, Estado.total))
+        }
+    })
+    Int addH = addBtn
 
     w.bind(Column(listOf(
         Heading("Tarefas"),
-        resumo,
-        Field("Adicionar", campo),
-        Button("Adicionar", () -> {
-            if (campo.text() != "") {
-                Estado.total = Estado.total + 1
-                resumo.text = progressBar(Estado.feitas, Estado.total)
-            }
-        })
+        resumoH,
+        Row(listOf(campoH, addH)),
+        Divider(),
+        lista
     )))
     w.show()
 }
 ```
 
 ```bash
-cat src/kof-ui-widgets.kf tarefas.kf > app.kf
-kof run app.kf --target=js     # webview nativo; fechar encerra o programa
+kof run "$(scripts/build.sh tarefas.kf)" --target=js
 ```
 
-Ou clone o repo e rode os exemplos prontos:
+Exemplos completos prontos:
 
 ```bash
 scripts/run-example.sh hello       # o menor app
-scripts/run-example.sh perfil      # card + field + badges
+scripts/run-example.sh perfil      # formulário + choices + overlays
 scripts/run-example.sh tarefas     # estado interativo
+scripts/run-example.sh dashboard   # stat cards + charts + tabela + navbar
 ```
+
+---
+
+# Como cada componente é construído
+
+Anatomia única, herdada do padrão do contador do `kof.ui`
+([docs/learn/01-patterns.md](docs/learn/01-patterns.md)):
+
+1. **estado estático pequeno** (`CheckboxState.on`)
+2. **record de partes** expondo handles (`CheckboxParts.root()`)
+3. **construtor** monta tudo no próprio escopo (irmão criado antes da ação)
+4. **lambda é cola**; **a lógica mora em função pura**
+5. **transições puras são testadas por valor exato**
+
+É por isso que a suíte afirma `monthGrid(2026,8)` caractere a caractere,
+`nextPage(10,10) == 10` e `sparkline([1,2,3]) == "▁▄█"` — sem abrir janela.
 
 ---
 
 # Instalação
 
-É source: concatene (ou cole) `src/kof-ui-widgets.kf` junto do seu programa.
-Detalhes em [docs/install.md](docs/install.md).
+Source: concatene com seu programa.
 
 ```bash
-kof version                        # precisa ser ≥ 0.0.14-alpha (kof.ui)
+OUT=$(scripts/build.sh meu-app.kf)
+kof run "$OUT" --target=js
 ```
+
+Detalhes e estrutura: [`docs/install.md`](docs/install.md).
+Requisito: distribuição Kof ≥ 0.0.14-alpha.
 
 ---
 
@@ -105,28 +135,27 @@ kof version                        # precisa ser ≥ 0.0.14-alpha (kof.ui)
 
 | Arquivo | Para quê |
 |---------|----------|
-| [`docs/widgets.md`](docs/widgets.md) | referência de cada widget: assinatura, exemplo, o que gera |
-| [`docs/patterns.md`](docs/patterns.md) | estado interativo: campos estáticos + captura de lambdas, anti-padrões |
-| [`docs/targets.md`](docs/targets.md) | o que roda em JVM / Native / KofJS e como testar cada camada |
-| [`docs/philosophy.md`](docs/philosophy.md) | as regras da biblioteca, herdadas da filosofia do Kof |
-| [`docs/roadmap.md`](docs/roadmap.md) | gaps honestos (`UIW00x`) e próximos passos |
-| [`docs/install.md`](docs/install.md) | inclusão no seu app e estrutura do repo |
+| [`docs/learn/`](docs/learn/00-intro.md) | capítulos numerados por família: como e quando usar |
+| [`docs/reference/api.md`](docs/reference/api.md) | todas as assinaturas e contratos |
+| [`docs/gaps.md`](docs/gaps.md) | limites honestos da plataforma (UIW001..UIW040) |
+| [`docs/targets.md`](docs/targets.md) | JVM / Native / KofJS |
+| [`docs/philosophy.md`](docs/philosophy.md) | as regras da casa |
+| [`docs/install.md`](docs/install.md) | inclusão no seu app |
 
-**Regra prática**: `docs/widgets.md` diz *o que existe*;
-`docs/patterns.md` ensina *como pensar*; `docs/philosophy.md` diz *por quê*.
+**Regra prática**: `learn/` ensina *como usar*; `reference/` diz *o que
+existe*; `gaps.md` diz *o que ainda não dá*; `philosophy.md` diz *por quê*.
 
 ---
 
 # Testes
 
 ```bash
-scripts/check.sh     # type-check da lib + exemplos + testes
-scripts/test.sh      # suíte: test "nome" { assert(...) } no alvo JVM
+scripts/test.sh     # todas as suítes: PASS por nome (alvo JVM)
+scripts/check.sh    # type-check da lib + exemplos
 ```
 
-A lógica pura é verificada por valor exato; a composição, por fumaça:
-montar a árvore completa de widgets não pode depender de renderização para
-passar — em JVM/Native os handles são no-ops.
+Puras por valor exato; construção por fumaça (montar árvores inteiras não
+pode depender de pixels).
 
 ---
 
@@ -134,20 +163,20 @@ passar — em JVM/Native os handles são no-ops.
 
 1. Cada widget é uma intenção com nome
 2. Zero mecanismo novo — só os oito primitivos do kof.ui
-3. APIs pequenas: oito widgets na 0.1.0, cada um puxando seu peso
-4. Convenção > configuração: um tema (o do Kof), zero config
-5. Limites honestos: o que depende de gap da plataforma fica no roadmap
+3. Lógica pura primeiro, pixel depois — e a pura entra na suíte
+4. Convenção > configuração: um tema, zero builders
+5. Limites honestos: gaps documentados com código, nunca fake idioms
 6. Human first, LLM friendly by consequence
 
-Herdados de [`docs/philosophy.md`](docs/philosophy.md) do Kof — leia lá a
-versão completa.
+Herdados de [`docs/philosophy.md`](docs/philosophy.md).
 
 ---
 
 # Licença
 
-GPLv3, igual ao Kof. Programas que usam esta biblioteca **não** viram
-automaticamente GPLv3 — ver [`docs/LICENSING.md`](https://github.com/KofLang/Kof4j/blob/main/docs/LICENSING.md).
+**BSD 3-Clause** — redistribuição de source e binários permitida com
+atribuição ([LICENSE](LICENSE)). Programas que usam a biblioteca não
+herdam obrigações além da nota de copyright ao redistribuírem o source.
 
 ---
 

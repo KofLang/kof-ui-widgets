@@ -5,7 +5,7 @@
 | [`learn/`](learn/00-intro.md) | quem usa a biblioteca | capítulos numerados por família: como e quando usar cada widget |
 | [`reference/api.md`](reference/api.md) | consulta rápida + LLMs | todas as assinaturas e contratos |
 | [`gaps.md`](gaps.md) | todos | limites honestos da plataforma, com códigos UIW00x |
-| [`philosophy.md`](philosophy.md) | contribuidores | as regras da biblioteca, herdadas do Kof |
+| [`philosophy.md`](philosophy.md) · [`roadmap.md`](roadmap.md) | contribuidores | as regras da casa e o que entra quando a plataforma resolver cada gap |
 | [`install.md`](install.md) | primeiro contato | inclusão no seu app, estrutura do repo |
 | [`targets.md`](targets.md) | build/CI | o que roda em JVM / Native / KofJS |
 

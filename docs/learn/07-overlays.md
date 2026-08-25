@@ -36,7 +36,7 @@ ações (o padrão dos exemplos).
 
 ## Drawer
 
-```kol
+```kof
 Drawer(String title, Int content): DrawerParts   // janela lateral estreita 280x640
 ```
 

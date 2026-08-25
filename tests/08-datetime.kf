@@ -32,7 +32,7 @@ test "mês anterior e próximo" {
 test "monthGrid de agosto/2026 é exata" {
     var expected = "ago 2026\n"
     expected = expected + "D  S  T  Q  Q  S  S\n"
-    expected = expected + "                       1\n"
+    expected = expected + "                   1\n"
     expected = expected + " 2  3  4  5  6  7  8\n"
     expected = expected + " 9 10 11 12 13 14 15\n"
     expected = expected + "16 17 18 19 20 21 22\n"

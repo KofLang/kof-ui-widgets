@@ -18,11 +18,12 @@ main() {
     Int bars = BarsChart(dias, semana, 5)
     Int trend = Text(sparkline(semana))
     Int trendCap = Muted("últimos 7 dias")
+    Int trendRow = Row(listOf(trend, trendCap))
     Int chartCol = Column(listOf(
         Subheading("downloads por dia"),
         bars,
         VSpace(8),
-        Row(listOf(trend, trendCap))
+        trendRow
     ))
 
     Int metaGauge = Gauge(68, 100)
@@ -33,21 +34,17 @@ main() {
         listOf("widgets;andamento;80%", "docs;feito;100%", "site;atrasado;45%")
     )
 
-    Int cards = Column(listOf(
-        downloads.root(),
-        receita.root(),
-        churn.root()
-    ))
-
+    Int cardsRow = Row(listOf(downloads.root(), receita.root(), churn.root()))
+    Int metaRow = Row(listOf(metaGauge, metaDonut))
+    Int progresso = Text(progressBar(29, 41))
     w.bind(Column(listOf(
         nav,
         crumb,
-        Row(listOf(downloads.root(), receita.root(), churn.root())),
+        cardsRow,
         chartCol,
-        Row(listOf(metaGauge, metaDonut)),
+        metaRow,
         tabela,
-        Text(progressBar(29, 41)),
-        cards
+        progresso
     )))
     w.show()
 }

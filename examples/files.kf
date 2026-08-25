@@ -23,7 +23,7 @@ main() {
         picker.root(),
         VSpace(8),
         Subheading("recentes"),
-        historico,
+        historico.root(),
         VSpace(8),
         Subheading("projeto"),
         tree
