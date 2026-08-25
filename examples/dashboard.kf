@@ -1,0 +1,53 @@
+// dashboard.kf — stat cards, charts, tabela e navegação num app só
+//
+//   scripts/run-example.sh dashboard
+
+main() {
+    var w = App("Dashboard")
+
+    Int nav = Navbar(listOf("visão", "vendas", "estoque"))
+    Int crumb = Breadcrumbs(listOf("kof", "dashboard", "agosto"))
+
+    var downloads = StatCard("downloads", "12.4k", "+8%")
+    var receita = StatCard("receita", "R$ 84k", "+2%")
+    var churn = StatCard("churn", "1.9%", "-0.3%")
+
+    var semana = listOf(12, 18, 9, 22, 30, 26, 41)
+    var dias = listOf("d", "s", "t", "q", "q", "s", "s")
+
+    Int bars = BarsChart(dias, semana, 5)
+    Int trend = Text(sparkline(semana))
+    Int trendCap = Muted("últimos 7 dias")
+    Int chartCol = Column(listOf(
+        Subheading("downloads por dia"),
+        bars,
+        VSpace(8),
+        Row(listOf(trend, trendCap))
+    ))
+
+    Int metaGauge = Gauge(68, 100)
+    Int metaDonut = Donut(72)
+
+    Int tabela = DataTable(
+        "produto;status;meta",
+        listOf("widgets;andamento;80%", "docs;feito;100%", "site;atrasado;45%")
+    )
+
+    Int cards = Column(listOf(
+        downloads.root(),
+        receita.root(),
+        churn.root()
+    ))
+
+    w.bind(Column(listOf(
+        nav,
+        crumb,
+        Row(listOf(downloads.root(), receita.root(), churn.root())),
+        chartCol,
+        Row(listOf(metaGauge, metaDonut)),
+        tabela,
+        Text(progressBar(29, 41)),
+        cards
+    )))
+    w.show()
+}

@@ -1,0 +1,32 @@
+// 06-overlays — glifos/cores puros + fumaça de janelas (JVM no-op).
+
+test "alertGlyph por tipo" {
+    assert(alertGlyph("ok") == "✓", "ok")
+    assert(alertGlyph("info") == "i", "info")
+    assert(alertGlyph("warn") == "!", "warn")
+    assert(alertGlyph("error") == "✕", "error")
+    assert(alertGlyph("qualquer") == "✓", "default é ok")
+}
+
+test "alertColor segue a semântica" {
+    assert(alertColor("error") == ErrorColor(), "erro usa cor de erro")
+    assert(alertColor("warn") == Palette.yellow, "warn amarelo")
+    assert(alertColor("info") == Palette.cyan, "info ciano")
+    assert(alertColor("ok") == Palette.green, "ok verde")
+}
+
+test "estado inicial do confirm" {
+    assert(confirmAnswered() == false, "não respondido")
+}
+
+test "overlays constroem (janelas no-op em JVM)" {
+    // chamar já é o teste: construir não pode lançar
+    MessageDialog("título", "mensagem")
+    Confirm("excluir?", "tem certeza?")
+    Drawer("menu", Muted("conteúdo lateral"))
+    Tooltip("kof", "linguagem orientada à intenção")
+    Toast("salvo com sucesso")
+}
+
+main() {
+}

@@ -1,0 +1,76 @@
+// 07-data — tabelas, árvores e listas: texto exato.
+
+test "split próprio" {
+    var parts = split("a;b;c", ";")
+    assert(parts.size == 3, "três células")
+    assert(parts.get(0) == "a", "célula 0")
+    assert(parts.get(1) == "b", "célula 1")
+    assert(parts.get(2) == "c", "célula 2")
+
+    var single = split("solo", ";")
+    assert(single.size == 1 && single.get(0) == "solo", "sem separador")
+
+    var empty = split("", ";")
+    assert(empty.size == 1 && empty.get(0) == "", "string vazia é uma célula")
+}
+
+test "tableText dimensiona colunas" {
+    var out = tableText("nome;idade", listOf("mel;26"))
+    assert(out.startsWith("nome  idade  \n"), "cabeçalho alinhado")
+    assert(out.contains("────"), "separador desenha")
+    assert(out.endsWith("mel   26     "), "linha de dados alinhada")
+}
+
+test "treeText indenta por profundidade" {
+    var paths = listOf("kof", "kof/compiler", "kof/compiler/lexer")
+    var out = treeText(paths)
+    assert(out.startsWith("• kof\n"), "raiz sem indentação")
+    assert(out.contains("\n  • compiler"), "um nível")
+    assert(out.endsWith("\n    • lexer"), "dois níveis")
+}
+
+test "listText lista e numera" {
+    var items = listOf("a", "b")
+    assert(listText(items, false) == "• a\n• b", "marcadores")
+    assert(listText(items, true) == "1. a\n2. b", "numerada")
+    assert(listText(listOf<String>(), false) == EmptyState.EMPTY_TEXT, "vazia")
+}
+
+test "timelineText encadeia" {
+    var events = listOf("nasceu", "cresceu")
+    assert(timelineText(events) == "○ nasceu\n│\n○ cresceu", "conector vertical")
+    assert(timelineText(listOf<String>()) == EmptyState.EMPTY_TEXT, "vazia")
+}
+
+test "avatarInitials" {
+    assert(avatarInitials("mel silva") == "ms", "duas palavras")
+    assert(avatarInitials("kof") == "k", "uma palavra")
+    assert(avatarInitials("") == "?", "vazio")
+    assert(avatarInitials("  ") == "?", "só espaços")
+}
+
+test "trimSpaces" {
+    assert(trimSpaces("  oi  ") == "oi", "dos lados")
+    assert(trimSpaces("oi") == "oi", "sem espaços")
+    assert(trimSpaces("   ") == "", "só espaços vira vazio")
+}
+
+test "data widgets constroem" {
+    var w = Window("dados")
+    Int table = DataTable("tarefa;status", listOf("compilar;feito", "testar;andamento"))
+    Int tree = TreeView(listOf("kof/ui/widgets"))
+    Int list = ListView(listOf("um", "dois"), true)
+    Int tl = Timeline(listOf("hoje", "amanhã"))
+    Int stat = StatCard("downloads", "12k", "+8%")
+    Int avatar = Avatar("mel")
+    w.bind(table)
+    w.bind(tree)
+    w.bind(list)
+    w.bind(tl)
+    w.bind(stat)
+    w.bind(avatar)
+    w.bind(Empty())
+}
+
+main() {
+}

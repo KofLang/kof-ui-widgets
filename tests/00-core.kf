@@ -1,0 +1,58 @@
+// 00-core.kf — helpers puros: valores exatos.
+
+test "repeat" {
+    assert(repeat("ab", 3) == "ababab", "3x ab")
+    assert(repeat("█", 0) == "", "0x é vazio")
+    assert(repeat("-", 1) == "-", "1x é o próprio")
+}
+
+test "padEnd" {
+    assert(padEnd("ab", 5) == "ab   ", "completa à direita")
+    assert(padEnd("abcde", 3) == "abcde", "não trunca")
+}
+
+test "padStart" {
+    assert(padStart("7", 3) == "  7", "completa à esquerda")
+    assert(padStart("2026", 4) == "2026", "já tem o tamanho")
+}
+
+test "ellipsis" {
+    assert(ellipsis("abcdef", 4) == "abc…", "corta e marca")
+    assert(ellipsis("abcd", 4) == "abcd", "no limite não corta")
+    assert(ellipsis("ab", 4) == "ab", "curto passa")
+    assert(ellipsis("xyz", 1) == "x", "largura mínima sem reticências")
+}
+
+test "substringN" {
+    assert(substringN("hello", 1, 3) == "el", "faixa central")
+    assert(substringN("hi", 5, 9) == "", "fora do alcance é vazio")
+    assert(substringN("abc", -1, 2) == "ab", "clamp no início")
+    assert(substringN("", 0, 3) == "", "string vazia")
+}
+
+test "countChar" {
+    assert(countChar("a/b/c", "/") == 2, "duas barras")
+    assert(countChar("", "/") == 0, "vazio tem zero")
+}
+
+test "join" {
+    assert(join(listOf("a", "b", "c"), ">") == "a>b>c", "três partes")
+    assert(join(listOf("solo"), "-") == "solo", "uma parte")
+    assert(join(listOf<String>(), "-") == "", "lista vazia")
+}
+
+test "clamp" {
+    assert(clamp(-5, 0, 10) == 0, "piso")
+    assert(clamp(99, 0, 10) == 10, "teto")
+    assert(clamp(5, 0, 10) == 5, "dentro passa")
+}
+
+test "wrap" {
+    assert(wrapNext(11, 12) == 0, "volta ao início")
+    assert(wrapPrev(0, 12) == 11, "recua para o fim")
+    assert(wrapPrev(1, 12) == 0, "passo normal")
+    assert(wrapNext(5, 0) == 0, "n zero é seguro")
+}
+
+main() {
+}

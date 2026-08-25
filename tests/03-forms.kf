@@ -1,0 +1,42 @@
+// 03-forms — validação pura com valores exatos.
+
+test "isBlank" {
+    assert(isBlank(""), "vazio é blank")
+    assert(isBlank("x") == false, "x não é blank")
+}
+
+test "comprimentos" {
+    assert(minLength("abc", 3), "3 >= 3")
+    assert(minLength("ab", 3) == false, "2 < 3")
+    assert(maxLength("abc", 3), "3 <= 3")
+    assert(maxLength("abcd", 3) == false, "4 > 3")
+}
+
+test "isEmail" {
+    assert(isEmail("mel@kof.dev"), "email válido")
+    assert(isEmail("a@b") == false, "curto demais")
+    assert(isEmail("@b.com") == false, "começa com @")
+    assert(isEmail("mel.kof@dev") == false, "@ depois do ponto")
+    assert(isEmail("semarroba.com") == false, "sem @")
+}
+
+test "isNumber" {
+    assert(isNumber("123"), "dígitos")
+    assert(isNumber("12a") == false, "letra não")
+    assert(isNumber("") == false, "vazio não é número")
+}
+
+test "indexOf" {
+    assert(indexOf("hello", "ll") == 2, "posição do ll")
+    assert(indexOf("hello", "z") == -1, "ausente")
+    assert(indexOf("hello", "") == -1, "agulha vazia é ausente por contrato")
+}
+
+test "validationSummary" {
+    assert(validationSummary(listOf<String>()) == "✓ tudo certo", "sem erros")
+    var two = listOf("nome", "email")
+    assert(validationSummary(two) == "✕ corrija 2 campo(s):\n• nome\n• email", "dois erros listados")
+}
+
+main() {
+}

@@ -1,0 +1,30 @@
+// 10-io — preview de arquivo: texto exato (função pura).
+
+test "filePreview mostra até 5 linhas" {
+    var three = split("l1\nl2\nl3", "\n")
+    assert(three.size == 3, "split por \\n funciona")
+
+    var small = filePreview("linha um\nlinha dois")
+    assert(small.startsWith("│ linha um\n"), "primeira linha prefixada")
+    assert(small.contains("│ linha dois"), "segunda linha presente")
+    assert(!small.contains("+"), "sem rodapé quando cabe")
+}
+
+test "filePreview trunca com rodapé" {
+    var big = filePreview("a\nb\nc\nd\ne\nf\ng")
+    assert(big.startsWith("│ a\n"), "começa na primeira")
+    assert(big.endsWith("+2 linhas"), "rodapé conta o resto")
+}
+
+test "filePreview vazio" {
+    assert(filePreview("") == "(arquivo vazio)", "vazio reportado")
+}
+
+test "FilePicker constrói" {
+    var w = Window("arquivos")
+    Int fp = FilePicker("abrir log")
+    w.bind(fp.root())
+}
+
+main() {
+}

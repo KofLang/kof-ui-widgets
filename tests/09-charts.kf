@@ -1,0 +1,49 @@
+// 09-charts — gráficos puros: valor exato.
+
+test "sparkline nivela" {
+    var up = listOf(1, 2, 3)
+    assert(sparkline(up) == "▁▄█", "subida")
+    var flat = listOf(5, 5, 5)
+    assert(sparkline(flat) == "▅▅▅", "flat no meio da régua")
+    assert(sparkline(listOf<Int>()) == "", "vazio")
+}
+
+test "HBar enche e clampa" {
+    assert(HBar(3, 10, 10) == "███░░░░░░░", "três de dez")
+    assert(HBar(15, 10, 20) == repeat("█", 20), "passa do fim: tudo cheio")
+    assert(HBar(0, 10, 4) == "░░░░", "zero é vazio")
+}
+
+test "ratioFill nunca divide por zero" {
+    assert(ratioFill(3, 0, 10) == 0, "max zero")
+    assert(ratioFill(5, 10, 20) == 10, "metade")
+}
+
+test "progressBar completa" {
+    assert(progressBar(5, 10) == "██████████░░░░░░░░░░ 5/10", "metade com contagem")
+    assert(progressBar(0, 10) == "░░░░░░░░░░░░░░░░░░░░ 0/10", "vazia")
+}
+
+test "donut em quadros" {
+    assert(donutText(0) == "○ 0%", "círculo vazio")
+    assert(donutText(50) == "◑ 50%", "meia lua cheia")
+    assert(donutText(100) == "● 100%", "completo")
+    assert(donutText(-5) == "○ 0%", "clamp negativo")
+}
+
+test "gauge com colchetes" {
+    assert(gaugeText(5, 10) == "[█████░░░░░] 50%", "meia escala")
+}
+
+test "charts constroem" {
+    var w = Window("charts")
+    var vals = listOf(3, 7, 5)
+    var labels = listOf("a", "b", "c")
+    w.bind(Sparkline(vals))
+    w.bind(BarsChart(labels, vals, 4))
+    w.bind(Donut(72))
+    w.bind(Gauge(3, 10))
+}
+
+main() {
+}

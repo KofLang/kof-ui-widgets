@@ -1,0 +1,55 @@
+// 08-datetime — Sakamoto contra âncoras conhecidas + grade exata.
+
+test "dayOfWeek âncoras históricas" {
+    assert(dayOfWeek(1970, 1, 1) == 4, "epoch: quinta")
+    assert(dayOfWeek(2000, 1, 1) == 6, "ano 2000: sábado")
+    assert(dayOfWeek(2024, 2, 29) == 4, "bissexto 2024: quinta")
+    assert(dayOfWeek(2026, 8, 1) == 6, "1/ago/2026: sábado")
+    assert(dayOfWeek(2026, 8, 24) == 1, "24/ago/2026: segunda")
+}
+
+test "daysInMonth" {
+    assert(daysInMonth(2026, 2) == 28, "fev comum")
+    assert(daysInMonth(2024, 2) == 29, "fev bissexto")
+    assert(daysInMonth(2026, 8) == 31, "agosto")
+    assert(daysInMonth(2026, 4) == 30, "abril")
+}
+
+test "isLeapYear" {
+    assert(isLeapYear(2024), "divisível por 4")
+    assert(isLeapYear(1900) == false, "centena não-bissexta")
+    assert(isLeapYear(2000), "quatrocentos é bissexto")
+    assert(isLeapYear(2026) == false, "ano comum")
+}
+
+test "mês anterior e próximo" {
+    assert(prevMonth(8) == 7, "agosto -> julho")
+    assert(prevMonth(1) == 12, "janeiro -> dezembro")
+    assert(nextMonth(8) == 9, "agosto -> setembro")
+    assert(nextMonth(12) == 1, "dezembro -> janeiro")
+}
+
+test "monthGrid de agosto/2026 é exata" {
+    var expected = "ago 2026\n"
+    expected = expected + "D  S  T  Q  Q  S  S\n"
+    expected = expected + "                       1\n"
+    expected = expected + " 2  3  4  5  6  7  8\n"
+    expected = expected + " 9 10 11 12 13 14 15\n"
+    expected = expected + "16 17 18 19 20 21 22\n"
+    expected = expected + "23 24 25 26 27 28 29\n"
+    expected = expected + "30 31\n"
+    assert(monthGrid(2026, 8) == expected, "grade de agosto/2026")
+}
+
+test "pickers constroem" {
+    var w = Window("datas")
+    Int cal = Calendar(2026, 8)
+    Int dp = DatePicker()
+    Int tp = TimePicker()
+    w.bind(cal)
+    w.bind(dp)
+    w.bind(tp)
+}
+
+main() {
+}

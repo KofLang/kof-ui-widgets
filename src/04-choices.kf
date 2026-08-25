@@ -1,0 +1,199 @@
+// 04-choices.kf — checkbox, toggle-switch, radio group e rating.
+//
+// Padrão de componente interativo da biblioteca:
+//   record de partes + estado estático + transições puras testáveis.
+// A lambda só cola: chama a transição pura e rebinda o irmão capturado
+// (criado antes da lambda — nunca o próprio botão).
+//
+// Multi-instância: cada componente compartilha o estado estático do seu
+// tipo (limite alpha documentado em docs/learn/01-patterns.md).
+
+// ---- Checkbox -----------------------------------------------------------------
+
+class CheckboxState {
+    static Bool on = false
+}
+
+record CheckboxParts(Int root)
+
+Checkbox(String label): CheckboxParts {
+    var theme = Theme.dark()
+    var mark = Label("[ ]")
+    var btn = Button(label, () -> {
+        CheckboxState.on = !CheckboxState.on
+        if (CheckboxState.on) {
+            mark.setText("[x] " + label)
+        } else {
+            mark.setText("[ ] " + label)
+        }
+    })
+    Int m = mark
+    Int b = btn
+    var col = Column(listOf(m, b))
+    var box = View(Style(theme.surface(), Palette.white, 8, 8))
+    box.bind(col)
+    Int bh = box
+    return CheckboxParts(bh)
+}
+
+isChecked(): Bool {
+    return CheckboxState.on
+}
+
+// transição pura (testável): alterna.
+flip(Bool v): Bool {
+    if (v) {
+        return false
+    }
+    return true
+}
+
+// ---- Toggle switch --------------------------------------------------------------
+
+class SwitchState {
+    static Bool on = false
+}
+
+record SwitchParts(Int root)
+
+ToggleSwitch(String label): SwitchParts {
+    var theme = Theme.dark()
+    var knob = Label("○ off")
+    var btn = Button(label, () -> {
+        SwitchState.on = flip(SwitchState.on)
+        if (SwitchState.on) {
+            knob.setText("● on")
+        } else {
+            knob.setText("○ off")
+        }
+    })
+    Int k = knob
+    Int b = btn
+    var row = Row(listOf(k, b))
+    var box = View(Style(theme.surface(), Palette.white, 8, 8))
+    box.bind(row)
+    Int bh = box
+    return SwitchParts(bh)
+}
+
+isSwitchOn(): Bool {
+    return SwitchState.on
+}
+
+// ---- Radio group ----------------------------------------------------------------
+
+class RadioState {
+    static Int selected = -1
+}
+
+record RadioParts(Int root)
+
+RadioGroup(List<String> options): RadioParts {
+    var theme = Theme.dark()
+    var choice = Label("nenhuma opção")
+
+    // até 4 opções, sem loop: cada botão captura a própria cópia do índice
+    var b0 = Button(options.get(0), () -> {
+        RadioState.selected = 0
+        choice.setText("> " + options.get(0))
+    })
+    var items = listOf(b0)
+    if (options.size > 1) {
+        var b1 = Button(options.get(1), () -> {
+            RadioState.selected = 1
+            choice.setText("> " + options.get(1))
+        })
+        items.add(b1)
+    }
+    if (options.size > 2) {
+        var b2 = Button(options.get(2), () -> {
+            RadioState.selected = 2
+            choice.setText("> " + options.get(2))
+        })
+        items.add(b2)
+    }
+    if (options.size > 3) {
+        var b3 = Button(options.get(3), () -> {
+            RadioState.selected = 3
+            choice.setText("> " + options.get(3))
+        })
+        items.add(b3)
+    }
+
+    Int c = choice
+    var col = Column(listOf(c))
+    var i = 0
+    while (i < items.size) {
+        col.bind(items.get(i))
+        i = i + 1
+    }
+    var box = View(Style(theme.surface(), Palette.white, 8, 8))
+    box.bind(col)
+    Int bh = box
+    return RadioParts(bh)
+}
+
+radioSelected(): Int {
+    return RadioState.selected
+}
+
+// ---- Rating -----------------------------------------------------------------------
+
+class RatingState {
+    static Int stars = 0
+}
+
+record RatingParts(Int root)
+
+Rating(String subject): RatingParts {
+    var theme = Theme.dark()
+    var face = Label(ratingFace(RatingState.stars))
+    var b1 = Button("★", () -> {
+        RatingState.stars = setStars(1)
+        face.setText(ratingFace(RatingState.stars))
+    })
+    var b2 = Button("★★", () -> {
+        RatingState.stars = setStars(2)
+        face.setText(ratingFace(RatingState.stars))
+    })
+    var b3 = Button("★★★", () -> {
+        RatingState.stars = setStars(3)
+        face.setText(ratingFace(RatingState.stars))
+    })
+    Int f = face
+    Int r1 = b1
+    Int r2 = b2
+    Int r3 = b3
+    Int strip = Row(listOf(r1, r2, r3))
+    Int sub = Muted(subject)
+    var col = Column(listOf(f, strip, sub))
+    var box = View(Style(theme.surface(), Palette.white, 8, 8))
+    box.bind(col)
+    Int bh = box
+    return RatingParts(bh)
+}
+
+ratingStars(): Int {
+    return RatingState.stars
+}
+
+// transição pura: estrelas são monotônicas (clique baixo reduz).
+setStars(Int n): Int {
+    if (n == RatingState.stars) {
+        return 0
+    }
+    return n
+}
+
+ratingFace(Int stars): String {
+    if (stars <= 0) {
+        return "☆☆☆"
+    }
+    if (stars == 1) {
+        return "★☆☆"
+    }
+    if (stars == 2) {
+        return "★★☆"
+    }
+    return "★★★"
+}

@@ -1,0 +1,42 @@
+// 01-02 — tipografia e layout: fumaça de construção (JVM: handles no-op).
+//
+// Construir e vincular nunca pode falhar, em nenhum alvo. O visual é
+// responsabilidade do alvo JS; aqui garantimos que a composição compila,
+// roda e aceita handles Int atravessando funções.
+
+test "tipografia constrói e vincula" {
+    var w = Window("tipografia")
+    w.bind(Heading("título"))
+    w.bind(Subheading("subtítulo"))
+    w.bind(Text("texto"))
+    w.bind(Muted("dica"))
+    w.bind(Code("println(x)"))
+    w.bind(Quote("menos cerimônia"))
+    w.bind(Link("kof.dev"))
+}
+
+test "layout constrói" {
+    var w = Window("layout")
+    Int section = Section("seção")
+    Int panel = Panel(Text("conteúdo"))
+    Int card = Card("cartão")
+    w.bind(section)
+    w.bind(panel)
+    w.bind(card)
+    w.bind(VSpace(8))
+    w.bind(HSpace(8))
+    w.bind(Divider())
+    w.bind(Badge("alpha"))
+    w.bind(Tag("novo", Palette.green))
+    w.bind(Chip("removível"))
+}
+
+test "cores semânticas são estáveis" {
+    assert(ErrorColor() == ErrorColor(), "erro é erro")
+    assert(PrimaryColor() == PrimaryColor(), "primária é primária")
+    assert(SurfaceColor() == SurfaceColor(), "superfície é superfície")
+    assert(TextColor() == TextColor(), "texto é texto")
+}
+
+main() {
+}

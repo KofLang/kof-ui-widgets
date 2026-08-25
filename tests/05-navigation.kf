@@ -1,0 +1,54 @@
+// 05-navigation — transições puras de navegação.
+
+test "paginação avança e limita" {
+    assert(nextPage(1, 10) == 2, "avança")
+    assert(nextPage(10, 10) == 10, "não passa do fim")
+    assert(prevPage(1, 10) == 1, "não passa do começo")
+    assert(prevPage(5, 10) == 4, "recua")
+    assert(nextPage(0, 0) == 1, "total zero trava na 1")
+    assert(prevPage(7, 0) == 1, "total zero trava na 1")
+}
+
+test "pagerLabel formata" {
+    assert(pagerLabel(2, 10) == "página   2 / 10", "página alinhada")
+    assert(pagerLabel(12, 100) == "página  12 / 100", "dois dígitos")
+    assert(pagerLabel(1, 0) == "sem páginas", "sem conteúdo")
+}
+
+test "tabBody troca de aba" {
+    var titles = listOf("A", "B")
+    var pages = listOf("um", "dois")
+    assert(tabBody(titles, pages, 0) == "▸ A\n\num", "aba 0")
+    assert(tabBody(titles, pages, 1) == "▸ B\n\ndois", "aba 1")
+    assert(tabBody(listOf<String>(), listOf<String>(), 0) == "", "sem abas")
+}
+
+test "accordion abre e fecha" {
+    assert(accordionBody("conteúdo", true) == "conteúdo", "aberto mostra")
+    assert(accordionBody("conteúdo", false) == "", "fechado esconde")
+    assert(accordionMark(true) == "▾", "marcador aberto")
+    assert(accordionMark(false) == "▸", "marcador fechado")
+}
+
+test "busca conta matches" {
+    var dataset = listOf("kof", "kof-ui", "dev")
+    assert(countMatches(dataset, "ko") == 2, "prefixo conta")
+    assert(countMatches(dataset, "") == 0, "query vazia não busca")
+    assert(countMatches(dataset, "zzz") == 0, "sem match")
+}
+
+test "searchReport resume" {
+    var dataset = listOf("kof", "kof-ui", "dev")
+    assert(searchReport(dataset, "") == "nada para \"\"", "vazio citado")
+    var hits = searchReport(dataset, "zzz")
+    assert(hits.startsWith("nada para"), "sem resultado reporta")
+    assert(searchReport(dataset, "kof").startsWith("2 resultado(s):"), "conta no título")
+}
+
+test "str converte" {
+    assert(str(42) == "42", "inteiro")
+    assert(str(0) == "0", "zero")
+}
+
+main() {
+}
