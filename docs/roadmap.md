@@ -18,6 +18,6 @@ dia, mantendo a assinatura já prevista aqui.
 
 ## Versionamento
 
-`VERSION` na raiz (`0.2.0-alpha`), mesma convenção do Kof. Enquanto alpha:
+`VERSION` na raiz (`0.3.0-alpha`), mesma convenção do Kof. Enquanto alpha:
 API pode mudar entre minors; qualquer remoção é documentada em
 [`gaps.md`](gaps.md) antes de sair.
