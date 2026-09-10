@@ -23,7 +23,7 @@ test "overlays constroem (janelas no-op em JVM)" {
     // chamar já é o teste: construir não pode lançar
     MessageDialog("título", "mensagem")
     Confirm("excluir?", "tem certeza?")
-    Drawer("menu", Muted("conteúdo lateral"))
+    Drawer("menu", Muted("conteúdo lateral") as Int)
     Tooltip("kof", "linguagem orientada à intenção")
     Toast("salvo com sucesso")
 }

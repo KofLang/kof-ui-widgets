@@ -1,0 +1,33 @@
+InteractionGallery(): View {
+    var input = Input("")
+    input.setPlaceholder("Digite e use Tab para mudar o foco")
+    input.setId("event-input")
+    var report = BodyText("Aguardando um evento")
+    report.setId("event-report")
+    input.on("input", (e: Event) -> report.setText("Valor: " + e.value()))
+    input.on("keydown", (e: Event) -> report.setText("Tecla: " + e.key() + " · alvo: " + e.target()))
+    input.on("focus", (e: Event) -> report.setText("Foco · origem: " + e.relatedTarget()))
+    var area = Surface(listOf(BodyText("Passe o ponteiro ou clique aqui")), SurfaceColor(), TextColor(), 24, 16)
+    area.setId("event-area")
+    area.on("mousemove", (e: Event) -> report.setText("Ponteiro: " + e.x() + ", " + e.y()))
+    area.on("click", (e: Event) -> report.setText("Clique no painel"))
+    var child = Button("Clique sem propagar")
+    child.setId("stop-event")
+    child.on("click", (e: Event) -> { e.stopPropagation(); report.setText("Clique apenas no botão") })
+    area.bind(child)
+    return ContentCard("08  Eventos, navegação e feedback", "Interações com payload e composições de widgets.", listOf(
+        ContentCard("Eventos", "input · keydown · focus · mousemove · click · stopPropagation", listOf(input, area, report)),
+        ContentCard("Navegação composta", "Tabs sem limite fixo de opções, accordion, paginação e busca ao digitar.", listOf(
+            Tabs(listOf("Visão", "Detalhes", "Código", "Histórico", "Ajuda"), listOf("Bem-vinda à galeria", "Detalhes do componente", "Código Kof", "Primeira versão", "Experimente os controles")).root(),
+            Accordion("Como usar", "Cada exemplo é uma função Kof no diretório examples/showcase.").root(),
+            Pagination(12).root(), SearchBox(listOf("Input", "Textarea", "Select", "Table", "Canvas", "Component"), "Busque um widget").root()
+        )),
+        ContentCard("Janelas e feedback", "As composições legadas usam janelas auxiliares, sem bloqueio modal.", listOf(
+            Wrap(listOf(Button("Mensagem", () -> { MessageDialog("Olá", "Seu trabalho foi salvo.") }),
+                Button("Confirmar", () -> { Confirm("Confirmação", "Deseja continuar?") }),
+                Button("Drawer", () -> { Drawer("Menu", Text("Conteúdo lateral") as Int) }),
+                Button("Toast", () -> { Toast("Tudo pronto") }))),
+            Tooltip("O que é Kof?", "Uma linguagem com primitivas de UI.").root()
+        ))
+    ))
+}

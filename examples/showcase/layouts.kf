@@ -1,0 +1,25 @@
+LayoutTile(String caption): View {
+    return Surface(listOf(BodyText(caption)), PrimaryColor(), TextColor(), 18, 12)
+}
+
+LayoutGallery(): View {
+    var grid = Grid(3, listOf(LayoutTile("1"), LayoutTile("2"), LayoutTile("3"), LayoutTile("4"), LayoutTile("5"), LayoutTile("6")))
+    return ContentCard("03  Composição e layout", "Primitivas da linguagem para organizar árvores de widgets.", listOf(
+        ContentCard("Row e Column", "Horizontal e vertical, com espaçamento padrão do runtime.", listOf(
+            Row(listOf(LayoutTile("A"), LayoutTile("B"), LayoutTile("C"))),
+            Column(listOf(Text("Primeiro"), Text("Segundo"), Text("Terceiro")))
+        )),
+        ContentCard("Grid", "Três colunas de mesma largura.", listOf(grid)),
+        ContentCard("Wrap", "Reduza a largura da janela para ver a quebra de linha.", listOf(
+            Wrap(listOf(LayoutTile("Composição"), LayoutTile("Intenção"), LayoutTile("Cor"), LayoutTile("Tipografia"), LayoutTile("Estado"), LayoutTile("Navegação")))
+        )),
+        ContentCard("Center · Align · Spacer", "Align usa 0 = início, 1 = centro, 2 = fim. Spacer distribui espaço flexível.", listOf(
+            Center(listOf(Badge("Centralizado"))), Align(2, 1, listOf(Badge("Alinhado ao fim"))),
+            Row(listOf(Text("Início"), Spacer(1), Text("Fim")))
+        )),
+        ContentCard("Box · Stack · separadores", "Stack está disponível, mas a sobreposição ainda depende de correção no runtime.", listOf(
+            Box(listOf(Text("Conteúdo de Box"))), Stack(listOf(Badge("Camada A"), Badge("Camada B"))),
+            Hr(), Text("Separador semântico Hr"), VSpace(8), Text("VSpace continua sendo um espaçador textual legado.")
+        ))
+    ))
+}

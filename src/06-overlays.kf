@@ -13,46 +13,46 @@ class ConfirmState {
     static Bool answered = false
 }
 
-record ConfirmParts(Int root)
-record DrawerParts(Int root)
-record TooltipParts(Int root)
+record ConfirmParts(Window root)
+record DrawerParts(Window root)
+record TooltipParts(View root)
 
 // ---- Dialog / Modal -------------------------------------------------------------
 
 // recebe uma subárvore PRONTA (handle Int) e a mostra num diálogo.
-Dialog(String title, Int content): Int {
+Dialog(String title, Int content): Window {
     var w = Window(title)
     w.size(460, 320)
-    w.theme = Theme.dark()
+    w.theme = CurrentTheme()
     var ok = Button("ok", () -> {
         w.close()
     })
-    Int cth = content
-    Int spc = VSpace(12)
-    Int okh = ok
+    var cth = content
+    var spc = VSpace(12)
+    var okh = ok
     var layout = Column(listOf(cth, spc, okh))
     w.bind(layout)
     w.show()
-    Int wh = w
+    var wh = w
     return wh
 }
 
-MessageDialog(String title, String message): Int {
+MessageDialog(String title, String message): Window {
     var content = Column(listOf(Text(message)))
-    Int ch = content
-    return Dialog(title, ch)
+    var ch = content
+    return Dialog(title, ch as Int)
 }
 
 Confirm(String title, String question): ConfirmParts {
     var answer = Label("pendente")
-    Int qh = Text(question)
-    Int sp8 = VSpace(8)
-    Int ah = answer
+    var qh = Text(question)
+    var sp8 = VSpace(8)
+    var ah = answer
     var body = Column(listOf(qh, sp8, ah))
 
     var w = Window(title)
     w.size(420, 240)
-    w.theme = Theme.dark()
+    w.theme = CurrentTheme()
     var yes = Button("confirmar", () -> {
         ConfirmState.answered = true
         answer.setText("✓ confirmado")
@@ -63,15 +63,15 @@ Confirm(String title, String question): ConfirmParts {
         answer.setText("✕ cancelado")
         w.close()
     })
-    Int bodyH = body
-    Int yh = yes
-    Int nh = no
-    Int actions = Row(listOf(yh, nh))
-    Int sp12 = VSpace(12)
+    var bodyH = body
+    var yh = yes
+    var nh = no
+    var actions = Row(listOf(yh, nh))
+    var sp12 = VSpace(12)
     w.bind(Column(listOf(bodyH, sp12, actions)))
     w.show()
 
-    Int wh = w
+    var wh = w
     return ConfirmParts(wh)
 }
 
@@ -84,13 +84,13 @@ confirmAnswered(): Bool {
 Drawer(String title, Int content): DrawerParts {
     var w = Window(title)
     w.size(280, 640)
-    w.theme = Theme.dark()
-    Int th = Subheading(title)
-    Int dh = Divider()
+    w.theme = CurrentTheme()
+    var th = Subheading(title)
+    var dh = Divider()
     var layout = Column(listOf(th, dh, content))
     w.bind(layout)
     w.show()
-    Int wh = w
+    var wh = w
     return DrawerParts(wh)
 }
 
@@ -98,61 +98,39 @@ Drawer(String title, Int content): DrawerParts {
 
 // O gatilho fica no fluxo da página; a explicação abre numa janela própria.
 Tooltip(String term, String explanation): TooltipParts {
-    var theme = Theme.dark()
-
-    var dlg = Window(term)
-    dlg.size(380, 200)
-    dlg.theme = Theme.dark()
-    var okBtn = Button("entendi", () -> {
-        dlg.close()
-    })
-    Int exh = Text(explanation)
-    Int spx = VSpace(12)
-    Int okx = okBtn
-    var dlgLayout = Column(listOf(exh, spx, okx))
-    dlg.bind(dlgLayout)
-
-    var btn = Button(term + " ?", () -> {
-        dlg.show()
-    })
-    var tipBadge = Badge("?")
-    Int btnh = btn
-    Int badgeh = tipBadge
-    var trigger = Row(listOf(btnh, badgeh))
-    var box = View(Style(theme.surface(), Palette.white, 8, 8))
-    box.bind(trigger)
-
-    Int bh = box
-    return TooltipParts(bh)
+    var button = Button(term + " ?", () -> { MessageDialog(term, explanation) })
+    var box = View(Style(SurfaceColor(), TextColor(), 8, 8))
+    box.bind(button)
+    return TooltipParts(box)
 }
 
 // ---- Toast ------------------------------------------------------------------------------
 
-Toast(String message): Int {
-    var theme = Theme.dark()
+Toast(String message): Window {
+    var theme = CurrentTheme()
     var msg = Label(message)
     var box = View(Style(theme.primary(), Palette.white, 10, 999))
     box.bind(msg)
 
     var w = Window("toast")
     w.size(360, 110)
-    w.theme = Theme.dark()
+    w.theme = CurrentTheme()
     var closeBtn = Button("✕ fechar", () -> {
         w.close()
     })
-    Int bxh = box
-    Int sp8b = VSpace(8)
-    Int cbh = closeBtn
+    var bxh = box
+    var sp8b = VSpace(8)
+    var cbh = closeBtn
     var layout = Column(listOf(bxh, sp8b, cbh))
     w.bind(layout)
     w.show()
-    Int wh = w
+    var wh = w
     return wh
 }
 
 // ---- Alert / Banner -------------------------------------------------------------------------
 
-Alert(String kind, String message): Int {
+Alert(String kind, String message): View {
     var glyph = Label(alertGlyph(kind))
     glyph.color = alertColor(kind)
     var m = Label(message)
@@ -160,7 +138,7 @@ Alert(String kind, String message): Int {
 
     var box = View(Style(Color.rgba(255, 255, 255, 16), alertColor(kind), 12, 8))
     box.bind(Row(listOf(glyph, m)))
-    Int bh = box
+    var bh = box
     return bh
 }
 
@@ -177,7 +155,7 @@ alertGlyph(String kind): String {
     return "✓"
 }
 
-alertColor(String kind): Int {
+alertColor(String kind): Color {
     if (kind == "error") {
         return ErrorColor()
     }

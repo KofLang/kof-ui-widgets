@@ -1,0 +1,31 @@
+StyleGallery(): View {
+    var theme = CurrentTheme()
+    var colors = Wrap(listOf(
+        ColorSwatch("primary", PrimaryColor()), ColorSwatch("secondary", SecondaryColor()),
+        ColorSwatch("surface", SurfaceColor()), ColorSwatch("background", BackgroundColor()),
+        ColorSwatch("text", TextColor()), ColorSwatch("error", ErrorColor())
+    ))
+    return ContentCard("02  Cores e estilos", "Temas claro e escuro, cores RGBA e superfícies parametrizadas.", listOf(
+        ContentCard("Cores semânticas", "Use os papéis do tema para manter consistência.", listOf(colors)),
+        ContentCard("Paleta da linguagem", "Todas as cores nomeadas de Palette.", listOf(Wrap(listOf(
+            ColorSwatch("red", Palette.red), ColorSwatch("green", Palette.green), ColorSwatch("blue", Palette.blue),
+            ColorSwatch("yellow", Palette.yellow), ColorSwatch("cyan", Palette.cyan), ColorSwatch("magenta", Palette.magenta),
+            ColorSwatch("orange", Palette.orange), ColorSwatch("purple", Palette.purple), ColorSwatch("pink", Palette.pink),
+            ColorSwatch("brown", Palette.brown), ColorSwatch("gray / grey", Palette.gray),
+            ColorSwatch("black", Palette.black), ColorSwatch("white", Palette.white), ColorSwatch("transparent", Palette.transparent)
+        )))),
+        ContentCard("Padding e cantos", "Style(background, foreground, padding, radius)", listOf(Wrap(listOf(
+            Surface(listOf(Text("0 px · reto")), SurfaceColor(), TextColor(), 0, 0),
+            Surface(listOf(Text("12 px · raio 8")), SurfaceColor(), TextColor(), 12, 8),
+            Surface(listOf(Text("24 px · raio 24")), SurfaceColor(), TextColor(), 24, 24),
+            Surface(listOf(Text("Pílula")), PrimaryColor(), TextColor(), 16, 999)
+        )))),
+        ContentCard("Transparência e composição", "Alpha 0–255. O runtime atual trata alphas intermediários com limitações; veja docs/gaps.md.", listOf(
+            Text(Color(60, 100, 220).toCss()),
+            Text("Canal alpha: " + Color.rgba(60, 100, 220, 128).alpha()),
+            Wrap(listOf(Badge("Novo"), Tag("Em andamento", SecondaryColor()), Chip("Kof"))),
+            Alert("ok", "Operação concluída"), Alert("info", "Uma informação útil"),
+            Alert("warn", "Revise antes de continuar"), Alert("error", "Não foi possível salvar")
+        ))
+    ))
+}

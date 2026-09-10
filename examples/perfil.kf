@@ -14,8 +14,9 @@ main() {
     var notif = ToggleSwitch("notificações")
     var plano = RadioGroup(listOf("free", "pro", "enterprise"))
     var nota = Rating("experiência até agora")
-    Int salvar = Button("salvar", () -> {
-        PerfilState.nome = TextFieldState.value
+    var salvar = Button("salvar", () -> {
+        var inputNome = campoNome.input()
+        PerfilState.nome = inputNome.text()
         MessageDialog("perfil", "salvo para: " + PerfilState.nome)
     })
 
@@ -33,10 +34,10 @@ main() {
     w.show()
 }
 
-AvatarRow(): Int {
-    Int avatar = Avatar("mel silva").root()
-    Int name = Subheading("mel")
-    Int handle = Muted("@mel")
-    Int ids = Column(listOf(name, handle))
+AvatarRow(): Row {
+    var avatar = Avatar("mel silva").root()
+    var name = Subheading("mel")
+    var handle = Muted("@mel")
+    var ids = Column(listOf(name, handle))
     return Row(listOf(avatar, ids))
 }

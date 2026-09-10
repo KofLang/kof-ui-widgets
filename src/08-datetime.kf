@@ -5,7 +5,7 @@
 // Relógio ao vivo fica de fora: now() devolve Long e não há conversão
 // Long→Int na plataforma (gap UIW020, docs/gaps.md).
 
-record PickerParts(Int root)
+record PickerParts(View root)
 
 // ---- dia da semana (0=domingo .. 6=sábado) ----------------------------------------
 
@@ -61,9 +61,9 @@ daysInMonth(Int year, Int month): Int {
 
 // ---- Calendar -------------------------------------------------------------------------
 
-Calendar(Int year, Int month): Int {
+Calendar(Int year, Int month): Label {
     var l = Label(monthGrid(year, month))
-    Int h = l
+    var h = l
     return h
 }
 
@@ -85,15 +85,16 @@ monthGrid(Int year, Int month): String {
     while (d <= total) {
         var label = padStart(str(d), 2)
         out = out + label
-        if (cell % 7 == 6 || d == total) {
-            out = out + "\n"
-        } else {
-            out = out + " "
-        }
+        out = out + calendarSuffix(cell, d, total)
         cell = cell + 1
         d = d + 1
     }
     return out
+}
+
+calendarSuffix(Int cell, Int day, Int total): String {
+    if (cell % 7 == 6 || day == total) { return "\n" }
+    return " "
 }
 
 monthName(Int month): String {
@@ -135,7 +136,7 @@ nextMonth(Int m): Int {
 }
 
 DatePicker(): PickerParts {
-    var theme = Theme.dark()
+    var theme = CurrentTheme()
     var view = Label(monthGrid(DateState.year, DateState.month))
 
     var prevM = Button("‹", () -> {
@@ -153,13 +154,13 @@ DatePicker(): PickerParts {
         view.setText(monthGrid(DateState.year, DateState.month))
     })
 
-    Int pmh = prevM
-    Int nmh = nextM
-    Int strip = Row(listOf(pmh, nmh))
+    var pmh = prevM
+    var nmh = nextM
+    var strip = Row(listOf(pmh, nmh))
     var col = Column(listOf(strip, view))
-    var box = View(Style(theme.surface(), Palette.white, 12, 8))
+    var box = View(Style(theme.surface(), theme.text(), 12, 8))
     box.bind(col)
-    Int bh = box
+    var bh = box
     return PickerParts(bh)
 }
 
@@ -171,7 +172,7 @@ class TimeState {
 }
 
 TimePicker(): PickerParts {
-    var theme = Theme.dark()
+    var theme = CurrentTheme()
     var view = Label(timeLabel())
 
     var upH = Button("+1h", () -> {
@@ -183,17 +184,16 @@ TimePicker(): PickerParts {
         view.setText(timeLabel())
     })
 
-    Int uh = upH
-    Int um = upM
-    Int actions = Row(listOf(uh, um))
+    var uh = upH
+    var um = upM
+    var actions = Row(listOf(uh, um))
     var col = Column(listOf(view, actions))
-    var box = View(Style(theme.surface(), Palette.white, 12, 8))
+    var box = View(Style(theme.surface(), theme.text(), 12, 8))
     box.bind(col)
-    Int bh = box
+    var bh = box
     return PickerParts(bh)
 }
 
 timeLabel(): String {
     return padStart(str(TimeState.hour), 2) + ":" + padStart(str(TimeState.minute), 2)
 }
-

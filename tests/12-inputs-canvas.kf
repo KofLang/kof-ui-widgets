@@ -1,0 +1,28 @@
+test "campos independentes e coleções vazias constroem" {
+    InputField("Nome", "nome", "text")
+    PasswordField("Senha")
+    MultilineField("Bio", "escreva")
+    SelectField("Plano", listOf("A", "B"))
+    RangeField("Volume", 50)
+    RadioGroup(listOf<String>())
+    Tabs(listOf<String>(), listOf<String>())
+    Navbar(listOf<String>())
+}
+
+test "Canvas aceita séries vazias e valores extremos" {
+    CanvasBars(listOf<String>(), listOf<Int>(), Palette.blue)
+    CanvasLine(listOf<Int>(), Palette.blue)
+    CanvasRing(-1, Palette.blue)
+    CanvasRing(101, Palette.blue)
+    var maximum = chartHeight(2147483647, 2147483647, 150)
+    assert(maximum == 150, "sem overflow na proporção")
+}
+
+test "Canvas rejeita séries incompatíveis" {
+    var rejected = false
+    try { CanvasBars(listOf("A"), listOf(1, 2), Palette.blue) }
+    catch (String error) { rejected = true }
+    assert(rejected, "cada valor precisa de um rótulo")
+}
+
+main() { }

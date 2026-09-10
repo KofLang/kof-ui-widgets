@@ -5,51 +5,63 @@
 //
 // Padrão do Kof: cada intenção é um construtor que devolve o handle pronto.
 
-Heading(String text): Int {
+Heading(String text): Label {
     var l = Label(text)
+    l.setFont(Font("DejaVu Sans", 14))
+    l.setColor(TextColor())
     l.fontSize = 26
     l.bold = true
-    Int h = l
+    var h = l
     return h
 }
 
-Subheading(String text): Int {
+Subheading(String text): Label {
     var l = Label(text)
+    l.setFont(Font("DejaVu Sans", 14))
+    l.setColor(TextColor())
     l.fontSize = 18
     l.bold = true
-    Int h = l
+    var h = l
     return h
 }
 
-Text(String text): Int {
+Text(String text): Label {
     var l = Label(text)
-    Int h = l
+    l.setFont(Font("DejaVu Sans", 14))
+    l.setColor(TextColor())
+    var h = l
     return h
 }
 
-Muted(String text): Int {
+Muted(String text): Label {
     var l = Label(text)
+    l.setFont(Font("DejaVu Sans", 14))
+    l.setColor(TextColor())
     l.fontSize = 13
-    l.color = Palette.gray
-    Int h = l
+    l.color = MutedColor()
+    var h = l
     return h
 }
 
-Code(String text): Int {
+Code(String text): Label {
     var l = Label(text)
+    l.setFont(Font("DejaVu Sans", 14))
+    l.setColor(TextColor())
     l.color = Palette.cyan
-    Int f = Font("monospace", 13)
+    var f = Font("DejaVu Sans Mono", 13)
     l.setFont(f)
-    Int h = l
+    var h = l
     return h
 }
 
-Quote(String text): Int {
-    var theme = Theme.dark()
+Quote(String text): View {
+    var theme = CurrentTheme()
     var bar = View(Style(theme.primary(), Palette.transparent, 2, 2))
     var l = Label(text)
-    l.color = Palette.gray
+    l.setFont(Font("DejaVu Sans", 14))
+    l.setColor(TextColor())
+    l.color = MutedColor()
     bar.bind(l)
-    Int h = bar
+    var h = bar
     return h
 }

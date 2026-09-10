@@ -1,0 +1,88 @@
+// Gráficos proporcionais na primitiva Canvas. Os gráficos textuais continuam disponíveis.
+chartMax(List<Int> values): Int {
+    var maximum = 1
+    for (var value in values) { if (value > maximum) { maximum = value } }
+    return maximum
+}
+
+chartHeight(Int value, Int maximum, Int height): Int {
+    if (maximum <= 0 || height <= 0) { return 0 }
+    return (clamp(value, 0, maximum) * 1.0 / maximum * height) as Int
+}
+
+CanvasBars(List<String> labels, List<Int> values, Color color): Canvas {
+    if (labels.size != values.size) { throw "CanvasBars: rótulos e valores devem ter o mesmo tamanho" }
+    var canvas = Canvas(480, 220)
+    var maximum = chartMax(values)
+    var count = values.size
+    if (count == 0) {
+        canvas.setFill(MutedColor())
+        canvas.fillText("Sem dados", 16, 24)
+        return canvas
+    }
+    var step = 440 / count
+    if (step < 2) { throw "CanvasBars: no máximo 220 barras" }
+    var index = 0
+    for (var value in values) {
+        var x = 20 + index * step
+        var y = 180 - chartHeight(value, maximum, 150)
+        canvas.setFill(color)
+        canvas.beginPath()
+        canvas.moveTo(x, 180)
+        canvas.lineTo(x, y)
+        canvas.lineTo(x + step - 2, y)
+        canvas.lineTo(x + step - 2, 180)
+        canvas.closePath()
+        canvas.fill()
+        canvas.setFill(TextColor())
+        canvas.fillText(labels.get(index), x, 204)
+        index = index + 1
+    }
+    return canvas
+}
+
+CanvasLine(List<Int> values, Color color): Canvas {
+    var canvas = Canvas(480, 200)
+    if (values.size == 0) { return canvas }
+    var maximum = chartMax(values)
+    var span = values.size - 1
+    if (span < 1) { span = 1 }
+    canvas.setStroke(color)
+    canvas.setLineWidth(3)
+    canvas.beginPath()
+    var index = 0
+    for (var value in values) {
+        var x = 20 + index * 440 / span
+        var y = 180 - chartHeight(value, maximum, 150)
+        chartPoint(canvas, index, x, y)
+        index = index + 1
+    }
+    canvas.stroke()
+    return canvas
+}
+
+chartPoint(Canvas canvas, Int index, Int x, Int y) {
+    if (index == 0) { canvas.moveTo(x, y) }
+    else { canvas.lineTo(x, y) }
+}
+
+CanvasRing(Int percent, Color color): Canvas {
+    var canvas = Canvas(200, 200)
+    var value = clamp(percent, 0, 100)
+    canvas.setLineWidth(16)
+    canvas.setStroke(MutedColor())
+    canvas.beginPath()
+    canvas.arc(100, 95, 65, 0.0, 6.283185307179586)
+    canvas.stroke()
+    if (value > 0) {
+        canvas.setStroke(color)
+        canvas.beginPath()
+        canvas.arc(100, 95, 65, -1.5707963267948966, -1.5707963267948966 + value * 0.06283185307179586)
+        canvas.stroke()
+    }
+    canvas.setFill(TextColor())
+    var caption = "" + value + "%"
+    var width = canvas.measureText(caption) as Int
+    canvas.fillText(caption, 100 - width / 2, 100)
+    return canvas
+}

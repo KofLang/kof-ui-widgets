@@ -43,12 +43,12 @@ test "monthGrid de agosto/2026 é exata" {
 
 test "pickers constroem" {
     var w = Window("datas")
-    Int cal = Calendar(2026, 8)
-    Int dp = DatePicker()
-    Int tp = TimePicker()
+    var cal = Calendar(2026, 8)
+    var dp = DatePicker()
+    var tp = TimePicker()
     w.bind(cal)
-    w.bind(dp)
-    w.bind(tp)
+    w.bind(dp.root())
+    w.bind(tp.root())
 }
 
 main() {

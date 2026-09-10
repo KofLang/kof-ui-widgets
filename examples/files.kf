@@ -11,7 +11,7 @@ main() {
     var picker = FilePicker("abrir arquivo de texto")
 
     var historico = ListView(listOf("VERSION", "README.md"), true)
-    Int tree = TreeView(listOf(
+    var tree = TreeView(listOf(
         "src/00-core.kf",
         "src/04-choices.kf",
         "docs/gaps.md",
@@ -23,7 +23,7 @@ main() {
         picker.root(),
         VSpace(8),
         Subheading("recentes"),
-        historico.root(),
+        historico,
         VSpace(8),
         Subheading("projeto"),
         tree

@@ -1,0 +1,32 @@
+test "moeda em centavos" {
+    assert(formatMoney(123456, "R$") == "R$ 1.234,56", "agrupa milhares")
+    assert(formatMoney(-9, "R$") == "-R$ 0,09", "negativo menor que um real")
+    assert(formatMoney(0, "€") == "€ 0,00", "zero")
+}
+
+test "percentuais limitados e sem divisão por zero" {
+    assert(formatPercent(3, 4) == "75%", "proporção")
+    assert(formatPercent(3, 0) == "—", "sem total")
+    assert(formatPercent(-5, 10) == "0%", "limite inferior")
+    assert(formatPercent(20, 10) == "100%", "limite superior")
+}
+
+test "datas e preenchimento" {
+    assert(formatDate(2024, 2, 29) == "29/02/2024", "bissexto")
+    assert(zeroPad(7, 3) == "007", "preenchimento")
+    assert(zeroPad(2026, 2) == "2026", "não trunca")
+}
+
+test "data inválida é rejeitada" {
+    var rejected = false
+    try { formatDate(2026, 2, 29) } catch (String error) { rejected = true }
+    assert(rejected, "29 de fevereiro em ano comum")
+}
+
+test "split rejeita separador vazio" {
+    var rejected = false
+    try { split("abc", "") } catch (String error) { rejected = true }
+    assert(rejected, "não pode entrar em loop infinito")
+}
+
+main() { }

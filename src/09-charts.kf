@@ -6,9 +6,9 @@
 // ---- Sparkline -----------------------------------------------------------------------
 
 // "▁▂▃▄▅▆▇█" — tendência numa linha.
-Sparkline(List<Int> values): Int {
+Sparkline(List<Int> values): Label {
     var l = Label(sparkline(values))
-    Int h = l
+    var h = l
     return h
 }
 
@@ -67,9 +67,9 @@ progressBar(Int value, Int max): String {
 
 // ---- Gráfico de colunas ----------------------------------------------------------------------
 
-BarsChart(List<String> labels, List<Int> values, Int height): Int {
+BarsChart(List<String> labels, List<Int> values, Int height): Label {
     var l = Label(barsText(labels, values, height))
-    Int h = l
+    var h = l
     return h
 }
 
@@ -118,11 +118,11 @@ barsText(List<String> labels, List<Int> values, Int height): String {
 
 // ---- Donut / Gauge -------------------------------------------------------------------------------
 
-Donut(Int percent): Int {
+Donut(Int percent): Label {
     var l = Label(donutText(percent))
     l.fontSize = 20
     l.bold = true
-    Int h = l
+    var h = l
     return h
 }
 
@@ -133,9 +133,9 @@ donutText(Int percent): String {
     return frames.get(idx) + " " + p + "%"
 }
 
-Gauge(Int value, Int max): Int {
+Gauge(Int value, Int max): Label {
     var l = Label(gaugeText(value, max))
-    Int h = l
+    var h = l
     return h
 }
 

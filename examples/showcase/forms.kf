@@ -1,0 +1,46 @@
+FormGallery(): View {
+    var name = InputField("Nome", "Como você se chama?", "text")
+    var nameInput = name.input()
+    nameInput.setId("form-name")
+    var email = InputField("E-mail", "voce@exemplo.com", "email")
+    var emailInput = email.input()
+    emailInput.setId("form-email")
+    var password = PasswordField("Senha")
+    var bio = MultilineField("Biografia", "Conte um pouco sobre você")
+    var plan = SelectField("Plano", listOf("Essencial", "Profissional", "Equipe"))
+    var consent = Checkbox("Aceito receber novidades")
+    var status = BodyText("Preencha o nome e o e-mail para salvar.")
+    status.setId("form-status")
+    var form = Form(listOf(Fieldset(listOf(name.root(), email.root(), password.root(), bio.root(), plan.root(), consent.root()), "Seu perfil")))
+    form.onSubmit(() -> {
+        var errors = listOf<String>()
+        if (isBlank(trimSpaces(nameInput.text()))) { errors.add("Informe seu nome") }
+        if (!isEmail(emailInput.text())) { errors.add("Informe um e-mail válido") }
+        if (errors.size == 0) { status.setText("Perfil salvo para " + nameInput.text()) }
+        else { status.setText(validationSummary(errors)) }
+    })
+    var submit = Button("Salvar perfil", () -> form.submit())
+    submit.setId("form-submit")
+    var readonly = Input("Somente leitura")
+    readonly.setReadonly(true)
+    var disabled = Button("Indisponível")
+    disabled.setDisabled(true)
+    var select = Select(listOf("Primeira", "Segunda", "Terceira"))
+    var selected = Text("Opção atual: 1")
+    select.on("change", (e: Event) -> selected.setText("Opção atual: " + (select.selected() + 1)))
+    return ContentCard("04  Formulários e escolhas", "Estado por campo, validação e submissão com Form.", listOf(
+        form, submit, status,
+        ContentCard("Tipos de entrada", "O navegador oferece os controles correspondentes a cada tipo.", listOf(
+            InputField("Número", "42", "number").root(), InputField("Data", "", "date").root(),
+            InputField("Hora", "", "time").root(), InputField("Cor", "", "color").root(),
+            InputField("Busca", "Buscar itens", "search").root(),
+            InputField("Telefone", "+55", "tel").root(), InputField("URL", "https://", "url").root(),
+            RangeField("Volume", 60).root()
+        )),
+        ContentCard("Seleção e estados", "Checkbox, radio, Select, rating, desabilitado e somente leitura.", listOf(
+            RadioGroup(listOf("Pequeno", "Médio", "Grande", "Extra grande", "Personalizado")).root(),
+            select, selected, ToggleSwitch("Alternar notificações").root(), Rating("Avalie a experiência").root(),
+            readonly, disabled
+        ))
+    ))
+}

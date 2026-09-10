@@ -12,30 +12,23 @@ class TextFieldState {
     static String value = ""
 }
 
-record TextFieldParts(Int root, Int refresh)
+record TextFieldParts(View root, Button refresh, Input input)
 
 TextField(String caption, String placeholder): TextFieldParts {
-    var theme = Theme.dark()
-    var cap = Muted(caption)
-    var inp = Input(placeholder)
-    var hint = Label("")
-    hint.fontSize = 12
-    hint.color = Palette.gray
-
-    Int capH = cap
-    Int inpH = inp
-    var field = Column(listOf(capH, inpH))
-    var box = View(Style(theme.surface(), Palette.white, 12, 8))
-    box.bind(field)
-    box.bind(hint)
-
-    box.bind(Button("↻ salvar valor", () -> {
+    var inp = Input("")
+    inp.setPlaceholder(placeholder)
+    var hint = Muted("")
+    inp.on("input", (e: Event) -> {
+        TextFieldState.value = e.value()
+        hint.setText("" + e.value().length + " caracteres")
+    })
+    var refresh = Button("↻ salvar valor", () -> {
         TextFieldState.value = inp.text()
         hint.setText("valor salvo")
-    }))
-
-    Int rootH = box
-    return TextFieldParts(rootH, rootH)
+    })
+    var box = View(Style(SurfaceColor(), TextColor(), 12, 8))
+    box.bind(Column(listOf(Muted(caption), inp, hint, refresh)))
+    return TextFieldParts(box, refresh, inp)
 }
 
 // ---- Validação (pura — testável em todos os alvos) ---------------------------

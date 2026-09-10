@@ -8,10 +8,10 @@ class FilePickerState {
     static String loadedPath = ""
 }
 
-record FilePickerParts(Int root)
+record FilePickerParts(View root)
 
 FilePicker(String label): FilePickerParts {
-    var theme = Theme.dark()
+    var theme = CurrentTheme()
     var cap = Muted(label)
     var pathInput = Input("caminho/do/arquivo.txt")
     var preview = Label("nenhum arquivo carregado")
@@ -32,16 +32,16 @@ FilePicker(String label): FilePickerParts {
         }
     })
 
-    Int loadH = load
-    Int aloneRow = Row(listOf(loadH))
-    Int capH = cap
-    Int pathH = pathInput
-    Int divH = Divider()
-    Int prevH = preview
+    var loadH = load
+    var aloneRow = Row(listOf(loadH))
+    var capH = cap
+    var pathH = pathInput
+    var divH = Divider()
+    var prevH = preview
     var layout = Column(listOf(capH, pathH, aloneRow, divH, prevH))
-    var box = View(Style(theme.surface(), Palette.white, 12, 8))
+    var box = View(Style(theme.surface(), theme.text(), 12, 8))
     box.bind(layout)
-    Int bh = box
+    var bh = box
     return FilePickerParts(bh)
 }
 

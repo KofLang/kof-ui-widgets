@@ -14,7 +14,15 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 [ -f "$APP" ] || { echo "não achei $APP" >&2; exit 1; }
 
 mkdir -p "$ROOT/.build"
-OUT="$ROOT/.build/$(basename "${APP%.kf}").kf"
+NAME="$(basename "${APP%.kf}")"
+if [[ "$NAME" == main ]]; then NAME="$(basename "$(dirname "$APP")")"; fi
+mkdir -p "$ROOT/.build/apps/$NAME"
+OUT="$ROOT/.build/apps/$NAME/main.kf"
 
-cat $(ls "$ROOT"/src/*.kf | sort) "$APP" > "$OUT"
+export LC_ALL=C
+if [[ "$(basename "$APP")" == main.kf ]]; then
+    cat "$ROOT"/src/*.kf "$(dirname "$APP")"/*.kf > "$OUT"
+else
+    cat "$ROOT"/src/*.kf "$APP" > "$OUT"
+fi
 echo "$OUT"

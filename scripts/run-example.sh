@@ -13,5 +13,7 @@ shift || true
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 KOF="${KOF:-kof}"
 
-OUT=$("$ROOT/scripts/build.sh" "$ROOT/examples/$NAME.kf")
+APP="$ROOT/examples/$NAME.kf"
+if [[ -f "$ROOT/examples/$NAME/main.kf" ]]; then APP="$ROOT/examples/$NAME/main.kf"; fi
+OUT=$("$ROOT/scripts/build.sh" "$APP")
 exec "$KOF" run "$OUT" --target=js "$@"

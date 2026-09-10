@@ -15,13 +15,13 @@ main() {
     var w = App("Tarefas")
 
     var resumo = Text(progressBar(0, 0))
-    var lista = Column(listOf<String>())
+    var lista = View(Style(SurfaceColor(), TextColor(), 8, 8))
     var campo = Input("o que precisa ser feito?")
     var cap = Muted("adicionar")
 
-    Int capH = cap
-    Int campoH = campo
-    Int resumoH = resumo
+    var capH = cap
+    var campoH = campo
+    var resumoH = resumo
 
     var addBtn = Button("+ adicionar", () -> {
         var tarefa = campo.text()
@@ -38,10 +38,10 @@ main() {
         }
     })
 
-    Int addH = addBtn
-    Int doneH = doneBtn
-    Int formRow = Row(listOf(campoH, addH))
-    Int actions = Row(listOf(addH, doneH))
+    var addH = addBtn
+    var doneH = doneBtn
+    var formRow = Row(listOf(campoH, addH))
+    var actions = Row(listOf(doneH))
 
     w.bind(Column(listOf(
         Heading("Tarefas"),

@@ -7,13 +7,12 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 KOF="${KOF:-kof}"
 
 mkdir -p "$ROOT/.build"
-LIB=$(ls "$ROOT"/src/*.kf | sort)
 
 ok=1
-for f in "$ROOT"/examples/*.kf; do
+for f in "$ROOT"/examples/*.kf "$ROOT"/examples/*/main.kf; do
+    [[ -f "$f" ]] || continue
     name="$(basename "$f" .kf)"
-    out="$ROOT/.build/check-$name.kf"
-    cat $LIB "$f" > "$out"
+    out=$("$ROOT/scripts/build.sh" "$f")
     echo "== exemplo: $name"
     if ! "$KOF" check "$out"; then
         ok=0

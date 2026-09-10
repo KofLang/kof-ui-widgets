@@ -1,0 +1,35 @@
+TypographyGallery(): View {
+    var sample = StyledText("Kof dá forma às suas ideias.", TypeStyle("DejaVu Sans", 24, false, PrimaryColor()))
+    sample.setId("type-preview")
+    var family = Select(listOf("DejaVu Sans", "DejaVu Serif", "DejaVu Sans Mono", "Liberation Sans", "Liberation Serif", "Intel One Mono"))
+    family.setId("font-family")
+    var sizes = Select(listOf("12", "16", "24", "32", "48"))
+    sizes.setSelected(2)
+    sizes.setId("font-size")
+    var bold = Checkbox("Negrito")
+    var boldInput = bold.input()
+    var edit = Input("Kof dá forma às suas ideias.")
+    edit.setId("type-text")
+    edit.on("input", (e: Event) -> sample.setText(e.value()))
+    var apply = Button("Aplicar fonte", () -> {
+        var families = listOf("DejaVu Sans", "DejaVu Serif", "DejaVu Sans Mono", "Liberation Sans", "Liberation Serif", "Intel One Mono")
+        var points = listOf(12, 16, 24, 32, 48)
+        sample.setFont(Font(families.get(family.selected()), points.get(sizes.selected()), boldInput.checked()))
+    })
+    apply.setId("apply-font")
+    return ContentCard("01  Tipografia e formatação", "Família, tamanho, peso e cor em exemplos editáveis.", listOf(
+        ContentCard("Laboratório de fontes", "A família precisa estar instalada no sistema; o navegador usa fallback quando necessário.", listOf(edit, Wrap(listOf(family, sizes)), bold.root(), apply, sample)),
+        ContentCard("Escala tipográfica", "Display · Heading · Subheading · Body · Caption", listOf(
+            DisplayText("Uma ideia ganha forma"), Heading("Título de página"), Subheading("Título de seção"),
+            BodyText("Texto de leitura com acentos: ação, informação, coração."), Caption("Legenda · 12 px"),
+            Code("var interface = Window(\"Olá, Kof\")"), Quote("Composição de widgets em código Kof.")
+        )),
+        ContentCard("Valores prontos para leitura", "Moeda em centavos, percentuais e calendário brasileiro.", listOf(
+            BodyText(formatMoney(123456789, "R$")), BodyText(formatMoney(-4250, "R$")),
+            BodyText(formatPercent(72, 100)), BodyText(formatDate(2026, 9, 10)),
+            Text(ellipsis("Uma descrição longa que precisa caber", 26)),
+            Code(padStart("42", 6) + "  ·  " + zeroPad(7, 3)),
+            Text("Texto com quebras\nSegunda linha\nTerceira linha")
+        ))
+    ))
+}

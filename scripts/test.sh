@@ -6,17 +6,18 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 KOF="${KOF:-kof}"
+TARGET="${TARGET:-js}"
 
 mkdir -p "$ROOT/.build"
-LIB=$(ls "$ROOT"/src/*.kf | sort)
 
 fail=0
 for f in "$ROOT"/tests/*.kf; do
     name="$(basename "$f" .kf)"
-    out="$ROOT/.build/test-$name.kf"
-    cat $LIB "$f" > "$out"
+    mkdir -p "$ROOT/.build/tests/$name"
+    out="$ROOT/.build/tests/$name/main.kf"
+    cat "$ROOT"/src/*.kf "$f" > "$out"
     echo "== suíte: $name"
-    if ! "$KOF" test "$out" --target jvm; then
+    if ! "$KOF" test "$out" --target "$TARGET"; then
         fail=1
     fi
 done

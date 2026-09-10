@@ -12,14 +12,14 @@ test "tipografia constrói e vincula" {
     w.bind(Muted("dica"))
     w.bind(Code("println(x)"))
     w.bind(Quote("menos cerimônia"))
-    w.bind(Link("kof.dev"))
+    w.bind(Link("Kof", "https://github.com/KofLang/Kof4j"))
 }
 
 test "layout constrói" {
     var w = Window("layout")
-    Int section = Section("seção")
-    Int panel = Panel(Text("conteúdo"))
-    Int card = Card("cartão")
+    var section = Section("seção")
+    var panel = Panel(Text("conteúdo") as Int)
+    var card = Card("cartão")
     w.bind(section)
     w.bind(panel)
     w.bind(card)

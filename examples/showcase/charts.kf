@@ -1,0 +1,25 @@
+ChartGallery(): View {
+    var values = listOf(12, 26, 18, 38, 29, 45, 52)
+    var labels = listOf("Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom")
+    var drawing = Canvas(300, 160)
+    drawing.save()
+    drawing.setFill(PrimaryColor())
+    drawing.setGlobalAlpha(0.6)
+    drawing.transform(1.0, 0.0, 0.0, 1.0, 20.0, 0.0)
+    drawing.beginPath()
+    drawing.arc(80, 80, 48, 0.0, 6.283185307179586)
+    drawing.fill()
+    drawing.restore()
+    drawing.setFill(TextColor())
+    drawing.fillText("Canvas 2D", 145, 84)
+    var clear = Button("Limpar desenho", () -> drawing.clearRect(0, 0, 300, 160))
+    return ContentCard("06  Gráficos e desenho", "Canvas para proporções visuais; texto para representações compactas.", listOf(
+        ContentCard("Barras", "Valores positivos proporcionais; negativos ficam em zero.", listOf(CanvasBars(labels, values, PrimaryColor()))),
+        ContentCard("Linha", "Uma série temporal em Canvas.", listOf(CanvasLine(values, SecondaryColor()))),
+        ContentCard("Progresso circular", "Arcos desenhados em radianos.", listOf(Wrap(listOf(CanvasRing(25, PrimaryColor()), CanvasRing(72, SecondaryColor()), CanvasRing(100, Palette.green))))),
+        ContentCard("Estado do contexto", "save, restore, transform, alpha, texto e clearRect.", listOf(drawing, clear)),
+        ContentCard("Alternativas textuais", "Sparkline, barras, donut e gauge.", listOf(
+            Sparkline(values), BarsChart(labels, values, 4), Donut(72), Gauge(3, 4), Code(progressBar(7, 10))
+        ))
+    ))
+}

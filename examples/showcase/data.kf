@@ -1,0 +1,24 @@
+DataGallery(): View {
+    var table = Table(listOf("Componente", "Família", "Estado"), listOf(
+        listOf("Input", "Formulários", "Disponível"), listOf("Grid", "Layout", "Disponível"), listOf("Canvas", "Gráficos", "Disponível")
+    ))
+    table.setId("data-table")
+    var update = Button("Atualizar tabela", () -> table.setRows(listOf(
+        listOf("Textarea", "Formulários", "Multilinha"), listOf("Select", "Escolhas", "Lista de opções")
+    )))
+    update.setId("table-update")
+    var list = Ul(listOf("Tipografia", "Layout", "Formulários"))
+    var replace = Button("Trocar itens", () -> list.setItems(listOf("Canvas", "Mídia", "Eventos")))
+    return ContentCard("05  Dados e calendário", "Tabelas semânticas, listas, indicadores e seletores de data.", listOf(
+        Wrap(listOf(StatCard("Receita", formatMoney(8432500, "R$"), "+8%").root(), StatCard("Conclusão", "72%", "+12%").root())),
+        ContentCard("Table", "Cabeçalho e linhas como listas; atualização com setRows.", listOf(table, update)),
+        ContentCard("Ul e Ol", "Listas com semântica de ordem.", listOf(list, replace, Ol(listOf("Criar", "Compilar", "Executar")))),
+        ContentCard("Composições de dados", "Árvore, timeline, avatar e estado vazio.", listOf(
+            TreeView(listOf("projeto", "projeto/src", "projeto/src/widgets", "projeto/docs")),
+            Timeline(listOf("Ideia", "Protótipo", "Primeira versão")), Avatar("Mel Santos").root(), Empty()
+        )),
+        ContentCard("Datas e horas", "Calendário textual e controles compostos, além dos inputs nativos da página Formulários.", listOf(
+            Calendar(2026, 9), DatePicker().root(), TimePicker().root()
+        ))
+    ))
+}

@@ -1,0 +1,63 @@
+// Campos com acesso ao estado da própria instância.
+record FieldParts(View root, Input input, Label hint)
+record MultilineParts(View root, Textarea input)
+record SelectParts(View root, Select input)
+
+InputField(String caption, String placeholder, String type): FieldParts {
+    var input = Input("")
+    input.setType(type)
+    input.setPlaceholder(placeholder)
+    input.setName(caption)
+    var hint = Caption("")
+    var root = ContentCard(caption, placeholder, listOf(input, hint))
+    return FieldParts(root, input, hint)
+}
+
+PasswordField(String caption): FieldParts {
+    var field = InputField(caption, "Digite sua senha", "password")
+    var input = field.input()
+    var root = field.root()
+    var visible = false
+    root.bind(Button("Mostrar / ocultar senha", () -> {
+        visible = !visible
+        if (visible) { input.setType("text") }
+        else { input.setType("password") }
+    }))
+    return field
+}
+
+MultilineField(String caption, String placeholder): MultilineParts {
+    var input = Textarea("")
+    input.setPlaceholder(placeholder)
+    return MultilineParts(ContentCard(caption, "Texto com várias linhas", listOf(input)), input)
+}
+
+SelectField(String caption, List<String> options): SelectParts {
+    var input = Select(options)
+    return SelectParts(ContentCard(caption, "Escolha uma opção", listOf(input)), input)
+}
+
+RangeField(String caption, Int initial): FieldParts {
+    var field = InputField(caption, "0 a 100", "range")
+    var input = field.input()
+    var hint = field.hint()
+    input.setText("" + clamp(initial, 0, 100))
+    hint.setText(input.text())
+    input.on("input", (e: Event) -> hint.setText(e.value()))
+    return field
+}
+
+// Estado reativo nativo. Cada Counter possui seu próprio Component.
+Counter(String caption, Int initial): Component {
+    var component = Component(initial)
+    component.view((value: Int) -> {
+        return ContentCard(caption, "Estado local", listOf(
+            DisplayText("" + value),
+            Row(listOf(
+                Button("−", () -> component.stateSet(component.state() - 1)),
+                Button("+", () -> component.stateSet(component.state() + 1))
+            ))
+        ))
+    })
+    return component
+}

@@ -36,8 +36,10 @@ test "countChar" {
 }
 
 test "join" {
-    assert(join(listOf("a", "b", "c"), ">") == "a>b>c", "três partes")
-    assert(join(listOf("solo"), "-") == "solo", "uma parte")
+    var parts = listOf("a", "b", "c")
+    var single = listOf("solo")
+    assert(join(parts, ">") == "a>b>c", "três partes")
+    assert(join(single, "-") == "solo", "uma parte")
     assert(join(listOf<String>(), "-") == "", "lista vazia")
 }
 

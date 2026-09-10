@@ -57,12 +57,12 @@ test "trimSpaces" {
 
 test "data widgets constroem" {
     var w = Window("dados")
-    Int table = DataTable("tarefa;status", listOf("compilar;feito", "testar;andamento"))
-    Int tree = TreeView(listOf("kof/ui/widgets"))
-    Int list = ListView(listOf("um", "dois"), true)
-    Int tl = Timeline(listOf("hoje", "amanhã"))
-    Int stat = StatCard("downloads", "12k", "+8%").root()
-    Int avatar = Avatar("mel").root()
+    var table = DataTable("tarefa;status", listOf("compilar;feito", "testar;andamento"))
+    var tree = TreeView(listOf("kof/ui/widgets"))
+    var list = ListView(listOf("um", "dois"), true)
+    var tl = Timeline(listOf("hoje", "amanhã"))
+    var stat = StatCard("downloads", "12k", "+8%").root()
+    var avatar = Avatar("mel").root()
     w.bind(table)
     w.bind(tree)
     w.bind(list)

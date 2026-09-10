@@ -11,27 +11,18 @@
 
 // ---- Checkbox -----------------------------------------------------------------
 
-record CheckboxParts(Int root)
+record CheckboxParts(View root, Input input)
 
 Checkbox(String label): CheckboxParts {
-    var theme = Theme.dark()
-    var on = false
-    var mark = Label("[ ]")
-    var btn = Button(label, () -> {
-        on = flip(on)
-        if (on) {
-            mark.setText("[x] " + label)
-        } else {
-            mark.setText("[ ] " + label)
-        }
-    })
-    Int m = mark
-    Int b = btn
-    var col = Column(listOf(m, b))
-    var box = View(Style(theme.surface(), Palette.white, 8, 8))
-    box.bind(col)
-    Int root = box
-    return CheckboxParts(root)
+    var input = Input("")
+    input.setType("checkbox")
+    var caption = Text(label)
+    var mark = View(Style(Palette.transparent, TextColor(), 0, 0))
+    mark.bind(input)
+    caption.on("click", (e: Event) -> input.setChecked(!input.checked()))
+    var box = View(Style(SurfaceColor(), TextColor(), 8, 8))
+    box.bind(Row(listOf(mark, caption)))
+    return CheckboxParts(box, input)
 }
 
 // transição pura (testável): alterna.
@@ -44,10 +35,10 @@ flip(Bool v): Bool {
 
 // ---- Toggle switch --------------------------------------------------------------
 
-record SwitchParts(Int root)
+record SwitchParts(View root)
 
 ToggleSwitch(String label): SwitchParts {
-    var theme = Theme.dark()
+    var theme = CurrentTheme()
     var on = false
     var knob = Label("○ off")
     var btn = Button(label, () -> {
@@ -58,12 +49,12 @@ ToggleSwitch(String label): SwitchParts {
             knob.setText("○ off")
         }
     })
-    Int k = knob
-    Int b = btn
+    var k = knob
+    var b = btn
     var row = Row(listOf(k, b))
-    var box = View(Style(theme.surface(), Palette.white, 8, 8))
+    var box = View(Style(theme.surface(), theme.text(), 8, 8))
     box.bind(row)
-    Int root = box
+    var root = box
     return SwitchParts(root)
 }
 
@@ -73,56 +64,37 @@ class RadioMirror {
     static Int lastSelected = -1
 }
 
-record RadioParts(Int root)
+record RadioParts(View root, List<Input> inputs)
+
+RadioOption(String caption, String group, Int index, Label choice): Input {
+    var input = Input("")
+    input.setType("radio")
+    input.setName(group)
+    input.on("change", (e: Event) -> {
+        RadioMirror.lastSelected = index
+        choice.setText("> " + caption)
+    })
+    return input
+}
 
 RadioGroup(List<String> options): RadioParts {
-    var theme = Theme.dark()
-    var selected = -1
     var choice = Label("nenhuma opção")
-
-    // até 4 opções, sem loop: cada botão captura a própria cópia do índice
-    var b0 = Button(options.get(0), () -> {
-        selected = 0
-        RadioMirror.lastSelected = 0
-        choice.setText("> " + options.get(0))
-    })
-    var items = listOf(b0)
-    if (options.size > 1) {
-        var b1 = Button(options.get(1), () -> {
-            selected = 1
-            RadioMirror.lastSelected = 1
-            choice.setText("> " + options.get(1))
-        })
-        items.add(b1)
+    var inputs = listOf<Input>()
+    var rows = listOf<Int>()
+    var group = "radio-" + (choice as Int)
+    var index = 0
+    for (var option in options) {
+        var input = RadioOption(option, group, index, choice)
+        inputs.add(input)
+        var mark = View(Style(Palette.transparent, TextColor(), 0, 0))
+        mark.bind(input)
+        rows.add(Row(listOf(mark, Text(option))) as Int)
+        index = index + 1
     }
-    if (options.size > 2) {
-        var b2 = Button(options.get(2), () -> {
-            selected = 2
-            RadioMirror.lastSelected = 2
-            choice.setText("> " + options.get(2))
-        })
-        items.add(b2)
-    }
-    if (options.size > 3) {
-        var b3 = Button(options.get(3), () -> {
-            selected = 3
-            RadioMirror.lastSelected = 3
-            choice.setText("> " + options.get(3))
-        })
-        items.add(b3)
-    }
-
-    Int c = choice
-    var col = Column(listOf(c))
-    var i = 0
-    while (i < items.size) {
-        col.bind(items.get(i))
-        i = i + 1
-    }
-    var box = View(Style(theme.surface(), Palette.white, 8, 8))
-    box.bind(col)
-    Int root = box
-    return RadioParts(root)
+    rows.add(choice as Int)
+    var box = View(Style(SurfaceColor(), TextColor(), 8, 8))
+    box.bind(Column(rows))
+    return RadioParts(box, inputs)
 }
 
 // espelho da última seleção (qualquer grupo) para lógica do app.
@@ -132,10 +104,10 @@ radioSelected(): Int {
 
 // ---- Rating -----------------------------------------------------------------------
 
-record RatingParts(Int root)
+record RatingParts(View root)
 
 Rating(String subject): RatingParts {
-    var theme = Theme.dark()
+    var theme = CurrentTheme()
     var stars = 0
     var face = Label(ratingFace(0))
     var b1 = Button("★", () -> {
@@ -150,16 +122,16 @@ Rating(String subject): RatingParts {
         stars = toggleStars(stars, 3)
         face.setText(ratingFace(stars))
     })
-    Int f = face
-    Int r1 = b1
-    Int r2 = b2
-    Int r3 = b3
-    Int strip = Row(listOf(r1, r2, r3))
-    Int sub = Muted(subject)
+    var f = face
+    var r1 = b1
+    var r2 = b2
+    var r3 = b3
+    var strip = Row(listOf(r1, r2, r3))
+    var sub = Muted(subject)
     var col = Column(listOf(f, strip, sub))
-    var box = View(Style(theme.surface(), Palette.white, 8, 8))
+    var box = View(Style(theme.surface(), theme.text(), 8, 8))
     box.bind(col)
-    Int root = box
+    var root = box
     return RatingParts(root)
 }
 

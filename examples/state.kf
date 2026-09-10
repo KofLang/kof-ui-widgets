@@ -1,0 +1,16 @@
+// Component + Store: estado local, compartilhado e cleanup de subscriptions.
+main() {
+    var window = App("Estado reativo")
+    var store = Store(0)
+    var local = Counter("Contador independente", 0)
+    var shared = Component(store.get())
+    shared.view((value: Int) -> ContentCard("Store compartilhado", "Atualizações observáveis", listOf(
+        DisplayText("" + value), Button("Somar ao Store", () -> store.set(store.get() + 1))
+    )))
+    var listener = (value: Int) -> shared.stateSet(value)
+    shared.onMount(() -> store.subscribe(listener))
+    shared.onDispose(() -> store.unsubscribe(listener))
+    window.bind(local)
+    window.bind(shared)
+    window.show()
+}

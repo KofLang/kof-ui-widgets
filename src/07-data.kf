@@ -4,19 +4,16 @@
 // alinhado (padEnd/padStart do core) com larguras calculadas. A intenção
 // permanece — "mostre estes dados tabulares" — e o alinhamento é nosso.
 
-record StatCardParts(Int root)
-record AvatarParts(Int root)
+record StatCardParts(View root)
+record AvatarParts(View root)
 
 // ---- DataTable ---------------------------------------------------------------------
 
 // Cada linha traz as células separadas por ";": "Mel;dev;ativo".
-DataTable(String headersCsv, List<String> rows): Int {
-    var l = Label(tableText(headersCsv, rows))
-    l.color = Palette.white
-    Int f = Font("monospace", 13)
-    l.setFont(f)
-    Int h = l
-    return h
+DataTable(String headersCsv, List<String> rows): Table {
+    var cells = listOf<List<String>>()
+    for (var row in rows) { cells.add(split(row, ";")) }
+    return Table(split(headersCsv, ";"), cells)
 }
 
 tableText(String headersCsv, List<String> rows): String {
@@ -24,7 +21,7 @@ tableText(String headersCsv, List<String> rows): String {
     if (headers.size == 0) {
         return ""
     }
-    var widths = columnWidths(headers, rows)
+    var widths = columnWidths(headersCsv, rows)
 
     var out = tableRow(headers, widths)
     out = out + "\n" + repeat("─", totalWidth(widths))
@@ -86,6 +83,7 @@ totalWidth(List<Int> widths): Int {
 
 // split próprio: a plataforma não tem String.split.
 split(String s, String sep): List<String> {
+    if (sep.length == 0) { throw "split: separador vazio" }
     var parts = listOf<String>()
     var rest = s
     while (rest.contains(sep)) {
@@ -99,9 +97,9 @@ split(String s, String sep): List<String> {
 
 // ---- TreeView -------------------------------------------------------------------------
 
-TreeView(List<String> paths): Int {
+TreeView(List<String> paths): Label {
     var l = Label(treeText(paths))
-    Int h = l
+    var h = l
     return h
 }
 
@@ -146,27 +144,22 @@ lastIndexOf(String s, String needle): Int {
 
 // ---- ListView ------------------------------------------------------------------------------
 
-ListView(List<String> items, Bool numbered): Int {
-    var l = Label(listText(items, numbered))
-    Int h = l
-    return h
+ListView(List<String> items, Bool numbered): View {
+    var box = View(Style(Palette.transparent, TextColor(), 0, 0))
+    if (items.size == 0) { box.bind(Empty()) }
+    else if (numbered) { box.bind(Ol(items)) }
+    else { box.bind(Ul(items)) }
+    return box
 }
 
 listText(List<String> items, Bool numbered): String {
     if (items.size == 0) {
         return EmptyState.EMPTY_TEXT
     }
-    var out = ""
-    var i = 0
+    var out = listBullet(0, numbered) + items.get(0)
+    var i = 1
     while (i < items.size) {
-        var bullet = "• "
-        if (numbered) {
-            bullet = str(i + 1) + ". "
-        }
-        if (i > 0) {
-            out = out + "\n"
-        }
-        out = out + bullet + items.get(i)
+        out = out + "\n" + listBullet(i, numbered) + items.get(i)
         i = i + 1
     }
     return out
@@ -174,9 +167,9 @@ listText(List<String> items, Bool numbered): String {
 
 // ---- Timeline ---------------------------------------------------------------------------------
 
-Timeline(List<String> events): Int {
+Timeline(List<String> events): Label {
     var l = Label(timelineText(events))
-    Int h = l
+    var h = l
     return h
 }
 
@@ -196,7 +189,7 @@ timelineText(List<String> events): String {
 // ---- StatCard -----------------------------------------------------------------------------------
 
 StatCard(String label, String value, String trend): StatCardParts {
-    var theme = Theme.dark()
+    var theme = CurrentTheme()
     var big = Label(value)
     big.fontSize = 30
     big.bold = true
@@ -212,9 +205,9 @@ StatCard(String label, String value, String trend): StatCardParts {
     tr.color = trendColor
     tr.fontSize = 12
 
-    var box = View(Style(theme.surface(), Palette.white, 14, 10))
+    var box = View(Style(theme.surface(), theme.text(), 14, 10))
     box.bind(Column(listOf(Muted(label), big, tr)))
-    Int bh = box
+    var bh = box
     return StatCardParts(bh)
 }
 
@@ -225,7 +218,7 @@ Avatar(String name): AvatarParts {
     initials.bold = true
     var box = View(Style(avatarColor(name), Palette.white, 8, 999))
     box.bind(initials)
-    Int bh = box
+    var bh = box
     return AvatarParts(bh)
 }
 
@@ -243,7 +236,7 @@ avatarInitials(String name): String {
     return first + second
 }
 
-avatarColor(String name): Int {
+avatarColor(String name): Color {
     var options = listOf(Palette.purple, Palette.blue, Palette.green, Palette.orange)
     var idx = clamp(name.length, 0, options.size - 1)
     return options.get(idx)
@@ -267,9 +260,14 @@ class EmptyState {
     static String EMPTY_TEXT = "nada por aqui ainda"
 }
 
-Empty(): Int {
+Empty(): Label {
     var l = Label(EmptyState.EMPTY_TEXT)
-    l.color = Palette.gray
-    Int h = l
+    l.color = MutedColor()
+    var h = l
     return h
+}
+
+listBullet(Int index, Bool numbered): String {
+    if (numbered) { return str(index + 1) + ". " }
+    return "• "
 }

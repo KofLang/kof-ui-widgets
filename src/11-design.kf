@@ -1,0 +1,108 @@
+// Tema, escala tipográfica e superfícies. Somente propriedades reais de kof.ui.
+class UiThemeState {
+    static Bool dark = true
+}
+
+useDarkTheme(Bool dark) { UiThemeState.dark = dark }
+
+CurrentTheme(): Theme {
+    if (UiThemeState.dark) { return Theme.dark() }
+    return Theme.light()
+}
+
+SecondaryColor(): Color {
+    return CurrentTheme().secondary()
+}
+
+BackgroundColor(): Color {
+    return CurrentTheme().background()
+}
+
+MutedColor(): Color {
+    if (UiThemeState.dark) { return Color(180, 184, 196) }
+    return Color(82, 88, 104)
+}
+
+record TypeStyle(String family, Int size, Bool bold, Color color)
+
+StyledText(String text, TypeStyle style): Label {
+    var label = Label(text)
+    label.setFont(Font(style.family(), clamp(style.size(), 8, 96), style.bold()))
+    label.setColor(style.color())
+    return label
+}
+
+DisplayText(String text): Label {
+    return StyledText(text, TypeStyle("DejaVu Sans", 40, true, TextColor()))
+}
+
+BodyText(String text): Label {
+    return StyledText(text, TypeStyle("DejaVu Sans", 16, false, TextColor()))
+}
+
+Caption(String text): Label {
+    return StyledText(text, TypeStyle("DejaVu Sans", 12, false, MutedColor()))
+}
+
+Surface(List<Int> children, Color background, Color foreground, Int padding, Int radius): View {
+    var view = View(Style(background, foreground, clamp(padding, 0, 96), clamp(radius, 0, 999)))
+    view.bind(Column(children))
+    return view
+}
+
+ContentCard(String title, String description, List<Int> children): View {
+    var items = listOf<Int>()
+    items.add(Subheading(title) as Int)
+    items.add(Muted(description) as Int)
+    items.add(VSpace(8) as Int)
+    for (var child in children) { items.add(child) }
+    return Surface(items, SurfaceColor(), TextColor(), 20, 16)
+}
+
+ColorSwatch(String name, Color color): View {
+    // Contraste aproximado por luminância inteira; alpha exige conhecer o fundo.
+    var ink = Palette.white
+    if (color.red() * 299 + color.green() * 587 + color.blue() * 114 > 150000) {
+        ink = Palette.black
+    }
+    return Surface(listOf(StyledText(name, TypeStyle("DejaVu Sans", 13, true, ink))), color, ink, 16, 12)
+}
+
+// Formatação determinística, sem locale implícito ou arredondamento de Double.
+// O valor monetário é dado em centavos; o cálculo inclui Int.MIN_VALUE.
+formatMoney(Int cents, String symbol): String {
+    var digits = "" + cents
+    var sign = ""
+    if (digits.startsWith("-")) {
+        sign = "-"
+        digits = digits.substring(1)
+    }
+    while (digits.length < 3) { digits = "0" + digits }
+    var whole = digits.substring(0, digits.length - 2)
+    var grouped = ""
+    var i = 0
+    while (i < whole.length) {
+        if (i > 0 && (whole.length - i) % 3 == 0) { grouped = grouped + "." }
+        grouped = grouped + whole.substring(i, i + 1)
+        i = i + 1
+    }
+    return sign + symbol + " " + grouped + "," + digits.substring(digits.length - 2)
+}
+
+formatPercent(Int value, Int total): String {
+    if (total <= 0) { return "—" }
+    var percent = (clamp(value, 0, total) * 100.0 / total) as Int
+    return "" + percent + "%"
+}
+
+formatDate(Int year, Int month, Int day): String {
+    if (year < 1 || month < 1 || month > 12) { throw "formatDate: data inválida" }
+    if (day < 1 || day > daysInMonth(year, month)) { throw "formatDate: dia inválido" }
+    return zeroPad(day, 2) + "/" + zeroPad(month, 2) + "/" + zeroPad(year, 4)
+}
+
+zeroPad(Int value, Int width): String {
+    var text = "" + value
+    while (text.length < width) { text = "0" + text }
+    return text
+}

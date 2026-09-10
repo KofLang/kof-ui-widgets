@@ -6,46 +6,23 @@
 
 // ---- Tabs ------------------------------------------------------------------------
 
-record TabParts(Int root)
+record TabParts(View root)
+
+TabButton(List<String> titles, List<String> pages, Int index, Label body): Button {
+    return Button(titles.get(index), () -> body.setText(tabBody(titles, pages, index)))
+}
 
 Tabs(List<String> titles, List<String> pages): TabParts {
-    var theme = Theme.dark()
-    var active = 0
     var body = Label(tabBody(titles, pages, 0))
-
-    var b0 = Button(titles.get(0), () -> {
-        active = 0
-        body.setText(tabBody(titles, pages, 0))
-    })
-    var items = listOf(b0)
-    if (titles.size > 1) {
-        var b1 = Button(titles.get(1), () -> {
-            active = 1
-            body.setText(tabBody(titles, pages, 1))
-        })
-        items.add(b1)
+    var buttons = listOf<Button>()
+    var index = 0
+    for (var title in titles) {
+        buttons.add(TabButton(titles, pages, index, body))
+        index = index + 1
     }
-    if (titles.size > 2) {
-        var b2 = Button(titles.get(2), () -> {
-            active = 2
-            body.setText(tabBody(titles, pages, 2))
-        })
-        items.add(b2)
-    }
-    if (titles.size > 3) {
-        var b3 = Button(titles.get(3), () -> {
-            active = 3
-            body.setText(tabBody(titles, pages, 3))
-        })
-        items.add(b3)
-    }
-
-    Int stripH = Row(items)
-    var box = View(Style(theme.surface(), Palette.white, 12, 8))
-    box.bind(stripH)
-    box.bind(body)
-    Int bh = box
-    return TabParts(bh)
+    var box = View(Style(SurfaceColor(), TextColor(), 12, 8))
+    box.bind(Column(listOf(Wrap(buttons), body)))
+    return TabParts(box)
 }
 
 // transição pura: corpo = "▸ título\n\nconteúdo".
@@ -63,10 +40,10 @@ tabBody(List<String> titles, List<String> pages, Int index): String {
 
 // ---- Accordion ----------------------------------------------------------------------
 
-record AccordionParts(Int root)
+record AccordionParts(View root)
 
 Accordion(String title, String content): AccordionParts {
-    var theme = Theme.dark()
+    var theme = CurrentTheme()
     var open = true
     var mark = Label(accordionMark(true))
     var body = Label(accordionBody(content, true))
@@ -75,13 +52,13 @@ Accordion(String title, String content): AccordionParts {
         mark.setText(accordionMark(open))
         body.setText(accordionBody(content, open))
     })
-    Int mh = mark
-    Int bh2 = btn
-    Int head = Row(listOf(mh, bh2))
+    var mh = mark
+    var bh2 = btn
+    var head = Row(listOf(mh, bh2))
     var col = Column(listOf(head, body))
-    var box = View(Style(theme.surface(), Palette.white, 8, 8))
+    var box = View(Style(theme.surface(), theme.text(), 8, 8))
     box.bind(col)
-    Int bh = box
+    var bh = box
     return AccordionParts(bh)
 }
 
@@ -105,7 +82,7 @@ class PageState {
     static Int page = 1
 }
 
-record PagerParts(Int root)
+record PagerParts(View root)
 
 Pagination(Int total): PagerParts {
     var info = Label(pagerLabel(PageState.page, total))
@@ -117,11 +94,11 @@ Pagination(Int total): PagerParts {
         PageState.page = nextPage(PageState.page, total)
         info.setText(pagerLabel(PageState.page, total))
     })
-    Int ph = prev
-    Int ih = info
-    Int nh = next
+    var ph = prev
+    var ih = info
+    var nh = next
     var row = Row(listOf(ph, ih, nh))
-    Int rh = row
+    var rh = row
     return PagerParts(rh)
 }
 
@@ -153,10 +130,10 @@ str(Int v): String {
 
 // ---- Breadcrumbs -------------------------------------------------------------------------
 
-Breadcrumbs(List<String> parts): Int {
+Breadcrumbs(List<String> parts): Label {
     var l = Label(join(parts, "  ›  "))
-    l.color = Palette.gray
-    Int h = l
+    l.color = MutedColor()
+    var h = l
     return h
 }
 
@@ -166,44 +143,20 @@ class NavState {
     static String route = "home"
 }
 
-record NavParts(Int root)
+record NavParts(Column root)
+
+NavButton(String route, Label status): Button {
+    return Button(route, () -> {
+        NavState.route = route
+        status.setText("→ " + route)
+    })
+}
 
 Navbar(List<String> routes): NavParts {
     var status = Label("→ " + NavState.route)
-
-    var b0 = Button(routes.get(0), () -> {
-        NavState.route = routes.get(0)
-        status.setText("→ " + routes.get(0))
-    })
-    var items = listOf(b0)
-    if (routes.size > 1) {
-        var b1 = Button(routes.get(1), () -> {
-            NavState.route = routes.get(1)
-            status.setText("→ " + routes.get(1))
-        })
-        items.add(b1)
-    }
-    if (routes.size > 2) {
-        var b2 = Button(routes.get(2), () -> {
-            NavState.route = routes.get(2)
-            status.setText("→ " + routes.get(2))
-        })
-        items.add(b2)
-    }
-    if (routes.size > 3) {
-        var b3 = Button(routes.get(3), () -> {
-            NavState.route = routes.get(3)
-            status.setText("→ " + routes.get(3))
-        })
-        items.add(b3)
-    }
-
-    Int navstrip = Row(items)
-    Int div = Divider()
-    Int st = status
-    var col = Column(listOf(navstrip, div, st))
-    Int h = col
-    return NavParts(h)
+    var buttons = listOf<Button>()
+    for (var route in routes) { buttons.add(NavButton(route, status)) }
+    return NavParts(Column(listOf(Wrap(buttons), Divider(), status)))
 }
 
 navRoute(): String {
@@ -217,13 +170,19 @@ class SearchState {
     static Int matches = 0
 }
 
-record SearchParts(Int root)
+record SearchParts(View root)
 
 SearchBox(List<String> dataset, String placeholder): SearchParts {
-    var theme = Theme.dark()
-    var inp = Input(placeholder)
+    var theme = CurrentTheme()
+    var inp = Input("")
+    inp.setPlaceholder(placeholder)
     var results = Label("digite para buscar em " + dataset.size + " itens")
 
+    inp.on("input", (e: Event) -> {
+        SearchState.query = e.value()
+        SearchState.matches = countMatches(dataset, e.value())
+        results.setText(searchReport(dataset, e.value()))
+    })
     var go = Button("buscar ⌕", () -> {
         SearchState.query = inp.text()
         SearchState.matches = countMatches(dataset, SearchState.query)
@@ -235,14 +194,14 @@ SearchBox(List<String> dataset, String placeholder): SearchParts {
         results.setText("busca limpa")
     })
 
-    Int inh = inp
-    Int gh = go
-    Int ch = clearBtn
-    Int actions = Row(listOf(gh, ch))
+    var inh = inp
+    var gh = go
+    var ch = clearBtn
+    var actions = Row(listOf(gh, ch))
     var col = Column(listOf(inh, actions, results))
-    var box = View(Style(theme.surface(), Palette.white, 12, 8))
+    var box = View(Style(theme.surface(), theme.text(), 12, 8))
     box.bind(col)
-    Int bh = box
+    var bh = box
     return SearchParts(bh)
 }
 

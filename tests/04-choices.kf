@@ -27,12 +27,12 @@ test "radioSelected começa sem seleção" {
 
 test "cada instância constrói independente" {
     var w = Window("choices")
-    Int c1 = Checkbox("primeira").root()
-    Int c2 = Checkbox("segunda").root()
-    Int sw = ToggleSwitch("som").root()
-    Int r1 = RadioGroup(listOf("pequeno")).root()
-    Int r4 = RadioGroup(listOf("a", "b", "c", "d")).root()
-    Int rt = Rating("kof").root()
+    var c1 = Checkbox("primeira").root()
+    var c2 = Checkbox("segunda").root()
+    var sw = ToggleSwitch("som").root()
+    var r1 = RadioGroup(listOf("pequeno")).root()
+    var r4 = RadioGroup(listOf("a", "b", "c", "d")).root()
+    var rt = Rating("kof").root()
     w.bind(c1)
     w.bind(c2)
     w.bind(sw)

@@ -1,0 +1,31 @@
+MediaGallery(): View {
+    var iconNames = listOf("home", "star", "heart", "search", "settings", "user", "menu", "close", "check", "plus", "minus", "trash", "edit", "share", "download", "upload", "mail", "phone", "calendar", "clock", "eye", "lock")
+    var icons = listOf<Int>()
+    for (var name in iconNames) {
+        icons.add(Surface(listOf(Icon(name, 28), Caption(name)), SurfaceColor(), TextColor(), 12, 8) as Int)
+    }
+    var image = Image("assets/mark.svg")
+    image.setAlt("Kof: composição de formas em roxo e verde")
+    image.setWidth(160)
+    image.setHeight(100)
+    var icon = Icon("heart", 32)
+    var changeIcon = Button("Trocar ícone", () -> { icon.setName("star"); icon.setSize(48) })
+    var audio = Audio("assets/tone.wav")
+    audio.setControls(true)
+    var video = Video("assets/motion.mp4")
+    video.setControls(true)
+    var frame = Iframe("assets/frame.html")
+    var file = Input("")
+    file.setType("file")
+    var filename = Text("Nenhum arquivo selecionado")
+    file.on("change", (e: Event) -> filename.setText(e.value()))
+    return ContentCard("07  Ícones e mídia", "Exemplos locais; nenhuma mídia externa é carregada ao abrir a galeria.", listOf(
+        ContentCard("Ícones embutidos", "Os 22 nomes disponíveis no runtime de Kof.", listOf(Wrap(icons), Row(listOf(icon, changeIcon)))),
+        ContentCard("Image e Link", "Imagem com descrição e dimensões; link com texto e destino.", listOf(image, Link("Documentação Kof no GitHub", "https://github.com/KofLang/Kof4j"))),
+        ContentCard("Audio e Video", "Controles do navegador, reprodução iniciada por você.", listOf(
+            audio, video, Wrap(listOf(Button("Reproduzir áudio", () -> audio.play()), Button("Pausar áudio", () -> audio.pause()), Button("Pausar vídeo", () -> video.pause())))
+        )),
+        ContentCard("Iframe", "Um documento local incorporado.", listOf(frame)),
+        ContentCard("Seleção de arquivo", "Input do navegador; o valor é um caminho mascarado, não o conteúdo do arquivo.", listOf(file, filename))
+    ))
+}

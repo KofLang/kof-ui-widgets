@@ -1,0 +1,69 @@
+// Galeria executável: scripts/run-example.sh showcase
+// Cada rota recria seus exemplos ao entrar; estado local é reiniciado.
+GalleryNavigation(String route, String caption): Button {
+    var button = Button(caption, () -> { Router.go(route) })
+    button.setId("nav-" + route)
+    return button
+}
+
+GalleryPage(Int page): View {
+    if (page == 1) { return TypographyGallery() }
+    if (page == 2) { return StyleGallery() }
+    if (page == 3) { return LayoutGallery() }
+    if (page == 4) { return FormGallery() }
+    if (page == 5) { return DataGallery() }
+    if (page == 6) { return ChartGallery() }
+    if (page == 7) { return MediaGallery() }
+    return InteractionGallery()
+}
+
+RegisterGallery(String route, Int page): Component {
+    var component = Component(0)
+    component.view((state: Int) -> GalleryPage(page))
+    Router.route(route, component)
+    return component
+}
+
+main() {
+    var window = App("Kof · UI Showcase")
+    window.size(1100, 820)
+    var title = DisplayText("Uma linguagem. Muitas interfaces.")
+    var subtitle = BodyText("Explore os widgets. Experimente as opções. Crie em Kof.")
+    var themeButton = Button("Alternar claro / escuro", () -> {
+        useDarkTheme(!UiThemeState.dark)
+        window.theme = CurrentTheme()
+        title.setColor(TextColor())
+        subtitle.setColor(TextColor())
+        // Voltar à rota desmontada aplica o tema aos exemplos novos.
+        var route = Router.current()
+        Router.replace("refresh")
+        Router.replace(route)
+    })
+    themeButton.setId("theme-toggle")
+    var header = Column(listOf(
+        Caption("KOF UI WIDGETS  /  CATÁLOGO INTERATIVO"), title, subtitle,
+        Wrap(listOf(
+            GalleryNavigation("type", "Tipografia"), GalleryNavigation("style", "Cores e estilos"),
+            GalleryNavigation("layout", "Layouts"), GalleryNavigation("forms", "Formulários"),
+            GalleryNavigation("data", "Dados e datas"), GalleryNavigation("charts", "Gráficos"),
+            GalleryNavigation("media", "Ícones e mídia"), GalleryNavigation("events", "Interações")
+        )),
+        Row(listOf(themeButton, Button("← Voltar", () -> { Router.back() }), Button("Avançar →", () -> { Router.forward() }))),
+        Hr()
+    ))
+    // O header é montado antes de registrar Component, evitando colisões de handles do runtime.
+    window.bind(header)
+    RegisterGallery("type", 1)
+    RegisterGallery("style", 2)
+    RegisterGallery("layout", 3)
+    RegisterGallery("forms", 4)
+    RegisterGallery("data", 5)
+    RegisterGallery("charts", 6)
+    RegisterGallery("media", 7)
+    RegisterGallery("events", 8)
+    var refresh = Component(0)
+    refresh.view((state: Int) -> Label(""))
+    Router.route("refresh", refresh)
+    Router.go("type")
+    window.show()
+}

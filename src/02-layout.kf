@@ -1,80 +1,76 @@
 // 02-layout.kf — containers com nome: seção, painel, respiro, divisor.
 
-Section(String title): Int {
-    var theme = Theme.dark()
+Section(String title): View {
+    var theme = CurrentTheme()
     var t = Subheading(title)
     var col = Column(listOf(t))
-    var box = View(Style(theme.surface(), Palette.white, 16, 12))
+    var box = View(Style(theme.surface(), theme.text(), 16, 12))
     box.bind(col)
-    Int h = box
+    var h = box
     return h
 }
 
-Panel(Int content): Int {
-    var theme = Theme.dark()
-    var box = View(Style(theme.surface(), Palette.white, 16, 12))
+Panel(Int content): View {
+    var theme = CurrentTheme()
+    var box = View(Style(theme.surface(), theme.text(), 16, 12))
     box.bind(content)
-    Int h = box
+    var h = box
     return h
 }
 
-Card(String title): Int {
-    var theme = Theme.dark()
+Card(String title): View {
+    var theme = CurrentTheme()
     var titulo = Heading(title)
-    var box = View(Style(theme.surface(), Palette.white, 16, 12))
+    var box = View(Style(theme.surface(), theme.text(), 16, 12))
     box.bind(titulo)
-    Int h = box
+    var h = box
     return h
 }
 
 // espaço vertical entre blocos (a plataforma não tem gap: é um label vazio).
-VSpace(Int px): Int {
+VSpace(Int px): Label {
     var l = Label("")
     l.fontSize = clamp(px, 4, 120)
-    Int h = l
+    var h = l
     return h
 }
 
-HSpace(Int px): Int {
+HSpace(Int px): Label {
     var l = Label(" ")
     l.fontSize = clamp(px, 4, 120)
-    Int h = l
+    var h = l
     return h
 }
 
-Divider(): Int {
-    var theme = Theme.dark()
-    var box = View(Style(theme.primary(), Palette.transparent, 1, 1))
-    box.bind(Label(" "))
-    Int h = box
-    return h
+Divider(): Hr {
+    return Hr()
 }
 
-Badge(String text): Int {
+Badge(String text): View {
     var l = Label(text)
     l.fontSize = 12
     var box = View(Style(Color.rgba(255, 255, 255, 24), Palette.white, 4, 999))
     box.bind(l)
-    Int h = box
+    var h = box
     return h
 }
 
-Tag(String text, Int color): Int {
+Tag(String text, Color color): View {
     var l = Label(text)
     l.fontSize = 12
     l.color = color
     var box = View(Style(Color.rgba(255, 255, 255, 16), color, 4, 999))
     box.bind(l)
-    Int h = box
+    var h = box
     return h
 }
 
-Chip(String text): Int {
-    var theme = Theme.dark()
+Chip(String text): View {
+    var theme = CurrentTheme()
     var l = Label(text + " ✕")
     l.fontSize = 12
-    var box = View(Style(theme.surface(), Palette.white, 6, 999))
+    var box = View(Style(theme.surface(), theme.text(), 6, 999))
     box.bind(l)
-    Int h = box
+    var h = box
     return h
 }
