@@ -1,4 +1,7 @@
 // 02-layout.kf — containers com nome: seção, painel, respiro, divisor.
+//
+// Superfícies ganham elevação real (setShadow, issue #78): o cartão flutua,
+// o painel assenta. No JVM/Native é no-op; no DOM do KofJS é box-shadow.
 
 Section(String title): View {
     var theme = CurrentTheme()
@@ -6,7 +9,7 @@ Section(String title): View {
     var col = Column(listOf(t))
     var box = View(Style(theme.surface(), theme.text(), 16, 12))
     box.bind(col)
-    var h = box
+    var h = Elevate(box, 1)
     return h
 }
 
@@ -14,7 +17,7 @@ Panel(Int content): View {
     var theme = CurrentTheme()
     var box = View(Style(theme.surface(), theme.text(), 16, 12))
     box.bind(content)
-    var h = box
+    var h = Elevate(box, 1)
     return h
 }
 
@@ -23,6 +26,37 @@ Card(String title): View {
     var titulo = Heading(title)
     var box = View(Style(theme.surface(), theme.text(), 16, 12))
     box.bind(titulo)
+    var h = Elevate(box, 2)
+    return h
+}
+
+// faixa de destaque com gradiente (primary -> secondary). Intenção:
+// "esta é a abertura da tela".
+Hero(String title, String subtitle): View {
+    var theme = CurrentTheme()
+    var box = View(Style(theme.primary(), Palette.white, 24, 16))
+    box.setGradient(theme.primary(), theme.secondary(), 135)
+    box.bind(Column(listOf(Heading(title), Text(subtitle))))
+    var h = box
+    return h
+}
+
+// largura máxima de leitura (setMaxWidth, issue #78): o conteúdo para de
+// esticar em telas largas. O wrapper centraliza com o Align da plataforma.
+Content(Int maxWidth, Int child): View {
+    var box = View(Style(Palette.transparent, TextColor(), 0, 0))
+    box.setMaxWidth(clamp(maxWidth, 240, 2000))
+    box.bind(child)
+    var h = box
+    return h
+}
+
+// ocupa o espaço restante na linha/coluna (setFlexBasis, issue #78):
+// "empurre isto até o fim".
+Fill(Int child): View {
+    var box = View(Style(Palette.transparent, TextColor(), 0, 0))
+    box.setFlexBasis(0)
+    box.bind(child)
     var h = box
     return h
 }

@@ -14,8 +14,8 @@ widget → primitivos":
 ### 1. O programador escreve o quê; a biblioteca decide o como
 
 Ninguém deveria saber que um cartão é `padding: 16; radius: 12`, que
-tabela é texto alinhado por larguras calculadas, que dia-da-semana é
-Sakamoto. Quem escreve o app escreve `Card("Perfil")`, `DataTable(...)`,
+tabela é texto alinhado por larguras calculadas, que dia-da-semana vem de
+`kof.time`. Quem escreve o app escreve `Card("Perfil")`, `DataTable(...)`,
 `dayOfWeek(...)`.
 
 ### 2. Simplicidade por padrão
@@ -36,7 +36,7 @@ travados por teste.
 
 ### 5. Zero mecanismo novo
 
-Source Kof puro compondo os mesmos oito primitivos. A biblioteca inteira
+Source Kof puro compondo os mesmos primitivos. A biblioteca inteira
 some amanhã? Seu app troca cada widget pelos primitivos equivalentes e
 continua compilando.
 
@@ -50,7 +50,9 @@ PASS/FAIL por nome, sem abrir janela.
 ### 7. Limites honestos
 
 O que depende de mecanismo inexistente está em [gaps.md](gaps.md) com
-código (`UIW001..UIW040`) — documentado, nunca fingido.
+código (`UIW001..UIW051`) — documentado, nunca fingido. Quando a
+plataforma fecha um gap, o mecanismo entra como widget e o código migra
+para "fechados" — sem mudar a assinatura da casa.
 
 ## A linha entre intenção e mecanismo
 

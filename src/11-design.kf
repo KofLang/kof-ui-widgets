@@ -1,4 +1,11 @@
-// Tema, escala tipográfica e superfícies. Somente propriedades reais de kof.ui.
+// Tema, escala tipográfica, superfícies e primitivas visuais. Somente
+// propriedades reais de kof.ui.
+//
+// A camada usa o que a plataforma expõe: Style(bg/fg/padding/radius) para a
+// caixa e, desde o issue #78, setBorder/setShadow/setGradient/setFlexBasis/
+// setMaxWidth para profundidade, contorno e layout flexível por widget.
+// Todas são no-op no JVM/Native e reais no DOM do KofJS — o teste de
+// construção vale em qualquer alvo.
 class UiThemeState {
     static Bool dark = true
 }
@@ -21,6 +28,39 @@ BackgroundColor(): Color {
 MutedColor(): Color {
     if (UiThemeState.dark) { return Color(180, 184, 196) }
     return Color(82, 88, 104)
+}
+
+// ---- Elevação e contorno (issue #78) ----------------------------------------
+//
+// Níveis 0..4: 0 = plana. Offset, blur e opacidade crescem juntos — puros e
+// testáveis por valor exato. `Elevate`/`Outline` aplicam no widget (no-op no
+// JVM/Native, DOM real no KofJS).
+
+shadowOffset(Int level): Int {
+    return clamp(level, 0, 4) * 2
+}
+
+shadowBlur(Int level): Int {
+    return clamp(level, 0, 4) * 6
+}
+
+shadowAlpha(Int level): Int {
+    return clamp(level, 0, 4) * 20
+}
+
+ShadowColor(Int level): Color {
+    return Color.rgba(0, 0, 0, shadowAlpha(level))
+}
+
+Elevate(View view, Int level): View {
+    var l = clamp(level, 0, 4)
+    if (l > 0) { view.setShadow(ShadowColor(l), shadowOffset(l), shadowBlur(l)) }
+    return view
+}
+
+Outline(View view, Color color, Int width): View {
+    view.setBorder(color, clamp(width, 1, 8))
+    return view
 }
 
 record TypeStyle(String family, Int size, Bool bold, Color color)

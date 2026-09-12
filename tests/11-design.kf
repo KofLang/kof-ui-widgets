@@ -29,4 +29,22 @@ test "split rejeita separador vazio" {
     assert(rejected, "não pode entrar em loop infinito")
 }
 
+test "elevação cresce por nível e clampa" {
+    assert(shadowOffset(0) == 0 && shadowBlur(0) == 0 && shadowAlpha(0) == 0, "nível 0 é plana")
+    assert(shadowOffset(2) == 4, "offset do nível 2")
+    assert(shadowBlur(2) == 12, "blur do nível 2")
+    assert(shadowAlpha(2) == 40, "opacidade do nível 2")
+    assert(shadowOffset(9) == shadowOffset(4), "clampa no topo")
+    assert(shadowBlur(-3) == 0, "clampa no piso")
+    assert(ShadowColor(0).alpha() == 0, "cor plana é transparente")
+    assert(ShadowColor(4).alpha() == 80, "cor elevada tem opacidade")
+}
+
+test "superfícies com elevação constroem" {
+    var w = Window("design")
+    w.bind(Hero("Kof", "menos cerimônia"))
+    w.bind(Content(640, Card("cartão") as Int))
+    w.bind(Fill(Text("ocupa o resto") as Int))
+}
+
 main() { }

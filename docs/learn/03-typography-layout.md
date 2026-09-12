@@ -32,11 +32,18 @@ Column(listOf(
 | `Section(title)` | bloco titulado | superfície + título; vincule conteúdo depois com `.bind` |
 | `Panel(content)` | moldura pronta | recebe subárvore `Int`; padding 16, raio 12 |
 | `Card(title)` | cartão com título | vincule o corpo depois com `.bind` |
+| `Hero(title, subtitle)` | abertura de tela | gradiente primary→secondary (`setGradient`) |
+| `Content(maxWidth, child)` | largura de leitura | para de esticar em telas largas (`setMaxWidth`) |
+| `Fill(child)` | ocupa o resto | flexível na linha/coluna (`setFlexBasis`) |
 | `VSpace(px)` / `HSpace(px)` | respiro | label vazio dimensionado; clampado em [4,120] |
 | `Divider()` | separador | barra fina da cor primária |
 
-A plataforma não tem propriedade de espaçamento (`gap`) nem tamanho de
-container — respiro aqui é um label vazio, honesto e barato.
+Superfícies têm **elevação real** (issue #78): `Section`/`Panel` assentam
+(nível 1), `Card` flutua (nível 2), via `setShadow`. A escala é pura e
+testável (`shadowOffset/shadowBlur/shadowAlpha`); `Elevate(view, level)`
+aplica. A plataforma também traz os containers de layout
+(`Box/Stack/Spacer/Wrap/Grid/Center/Align`) — use-os direto quando a
+intenção for estrutural.
 
 ## Marcadores
 

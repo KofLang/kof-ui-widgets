@@ -37,6 +37,7 @@ O label é rebindado; a função é a mesma dos testes.
 ## Limites honestos
 
 Gráficos são monoespaçados por natureza — em fontes proporcionais as
-colunas de `BarsChart` entortam. Canvas/SVG não existem na plataforma
-([gaps.md](../gaps.md), UIW030); quando existirem, a API pura destas
-funções continua sendo o contrato.
+colunas de `BarsChart` entortam. Para pixel real, a família `13-canvas`
+desenha no `Canvas` 2D da plataforma (`CanvasBars`/`CanvasLine`/
+`CanvasRing`), com as mesmas contas puras no teste. A API textual continua
+o contrato padrão — leve, copiável, idêntica nos três alvos.

@@ -1,62 +1,39 @@
 // 08-datetime.kf — calendário, date picker e time picker.
 //
-// Sem biblioteca de datas além de kof.time now(): dia-da-semana é
-// calculado com o algoritmo de Sakamoto (puro, testável contra âncoras).
-// Relógio ao vivo fica de fora: now() devolve Long e não há conversão
-// Long→Int na plataforma (gap UIW020, docs/gaps.md).
+// O calendário civil vem de `kof.time` (time.dayOfWeek/isLeapYear/
+// daysInMonth/isWeekend) — a plataforma cuida da aritmética; a biblioteca
+// só converte para 0=domingo e desenha a grade. As funções continuam puras
+// e testáveis por valor exato (as âncoras históricas do teste continuam
+// valendo, porque a plataforma tem paridade byte-a-byte nos alvos).
+//
+// Relógio ao vivo: `time.now()` devolve Long e a conversão/format continua
+// gap (UIW020, docs/gaps.md); os pickers seguem ancorados em estado local.
 
 record PickerParts(View root)
 
-// ---- dia da semana (0=domingo .. 6=sábado) ----------------------------------------
+// ---- calendário civil (kof.time) ----------------------------------------------------
+//
+// A plataforma já traz o calendário (S7-wedge, paridade JVM/JS/Native):
+// `time.dayOfWeek` (ISO, 1=segunda .. 7=domingo), `time.isLeapYear`,
+// `time.daysInMonth` e `time.isWeekend`. A biblioteca não reimplementa a
+// plataforma (R2) — só converte para o contrato da casa (0=domingo).
 
+// dia da semana (0=domingo .. 6=sábado).
 dayOfWeek(Int year, Int month, Int day): Int {
-    var t = monthOffsets()
-    var y = year
-    if (month < 3) {
-        y = y - 1
-    }
-    var sum = y + y / 4 - y / 100 + y / 400 + t.get(month - 1) + day
-    return sum % 7
-}
-
-monthOffsets(): List<Int> {
-    var t = listOf<Int>()
-    t.add(0)
-    t.add(3)
-    t.add(2)
-    t.add(5)
-    t.add(0)
-    t.add(3)
-    t.add(5)
-    t.add(1)
-    t.add(4)
-    t.add(6)
-    t.add(2)
-    t.add(4)
-    return t
+    return time.dayOfWeek(year, month, day) % 7
 }
 
 isLeapYear(Int year): Bool {
-    if (year % 400 == 0) {
-        return true
-    }
-    if (year % 100 == 0) {
-        return false
-    }
-    return year % 4 == 0
+    return time.isLeapYear(year)
 }
 
 daysInMonth(Int year, Int month): Int {
-    if (month == 2) {
-        if (isLeapYear(year)) {
-            return 29
-        }
-        return 28
-    }
-    if (month == 4 || month == 6 || month == 9 || month == 11) {
-        return 30
-    }
-    return 31
+    return time.daysInMonth(year, month)
+}
+
+// sábado ou domingo — o `isWeekend` da plataforma.
+isWeekend(Int year, Int month, Int day): Bool {
+    return time.isWeekend(year, month, day)
 }
 
 // ---- Calendar -------------------------------------------------------------------------

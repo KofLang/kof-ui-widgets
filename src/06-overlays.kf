@@ -111,6 +111,7 @@ Toast(String message): Window {
     var msg = Label(message)
     var box = View(Style(theme.primary(), Palette.white, 10, 999))
     box.bind(msg)
+    Elevate(box, 3)
 
     var w = Window("toast")
     w.size(360, 110)
@@ -138,7 +139,7 @@ Alert(String kind, String message): View {
 
     var box = View(Style(Color.rgba(255, 255, 255, 16), alertColor(kind), 12, 8))
     box.bind(Row(listOf(glyph, m)))
-    var bh = box
+    var bh = Outline(box, alertColor(kind), 1)
     return bh
 }
 

@@ -18,27 +18,35 @@ provam o como antes de qualquer pixel existir.**
 ```
 
 Sem CSS, sem ids de DOM, sem builder, sem framework. Source Kof puro
-compondo os primitivos do [`kof.ui`](https://github.com/KofLang/Kof4j/blob/main/learn/35-kof-ui.md).
+compondo os primitivos do [`kof.ui`](https://github.com/KofLang/Kof4j/blob/main/learn/35-kof-ui.md)
+— inclusive os visuais por widget (`setShadow`/`setBorder`/`setGradient`/
+`setFlexBasis`/`setMaxWidth`, issue #78) e a stdlib (`kof.time`,
+`kof.validation`, `kof.strings`, `kof.math`).
+
+**Baseline:** Kof **0.3.22-beta**. Versão da lib: `0.4.0-alpha`.
 
 ---
 
 # O que é
 
-Onze módulos, ~50 intenções cobrindo o ciclo completo de uma UI de app:
+Quatorze módulos, ~65 intenções cobrindo o ciclo completo de uma UI de app:
 
 | Família | Destaques |
 |---------|-----------|
 | [core](docs/learn/02-core.md) | `App`, cores semânticas, `repeat/pad/ellipsis/clamp/wrap/str` |
-| [tipografia + layout](docs/learn/03-typography-layout.md) | `Heading..Quote`, `Section/Panel/Card`, `VSpace/HSpace/Divider` |
+| [tipografia + layout](docs/learn/03-typography-layout.md) | `Heading..Quote`, `Section/Panel/Card`, `Hero/Content/Fill`, `VSpace/HSpace/Divider` |
 | marcadores | `Badge`, `Tag`, `Chip` |
 | [formulários](docs/learn/04-forms.md) | `TextField`, validação pura (`isEmail`, `validationSummary`) |
 | [escolhas](docs/learn/05-choices.md) | `Checkbox`, `ToggleSwitch`, `RadioGroup`, `Rating` — estado por instância |
 | [navegação](docs/learn/06-navigation.md) | `Tabs`, `Accordion`, `Pagination`, `Navbar`, `Breadcrumbs`, `SearchBox` |
 | [overlays](docs/learn/07-overlays.md) | `Dialog`, `Confirm`, `Drawer`, `Tooltip`, `Toast`, `Alert` |
 | [dados](docs/learn/08-data.md) | `DataTable`, `TreeView`, `ListView`, `Timeline`, `StatCard`, `Avatar`, `Empty` |
-| [data/hora](docs/learn/09-datetime.md) | `Calendar`, `DatePicker`, `TimePicker` (Sakamoto puro, ancorado em datas históricas) |
+| [data/hora](docs/learn/09-datetime.md) | `Calendar`, `DatePicker`, `TimePicker` (calendário via `kof.time`, ancorado em datas históricas) |
 | [gráficos](docs/learn/10-charts.md) | `Sparkline`, `BarsChart`, `Donut`, `Gauge`, `HBar`, `progressBar` |
 | [arquivos](docs/learn/11-io.md) | `FilePicker` com preview via kof.io |
+| design | `Surface`, `ContentCard`, `Elevate/Outline`, escala de sombra pura |
+| inputs | `InputField`, `PasswordField`, `MultilineField`, `SelectField`, `RangeField`, `Counter` |
+| canvas | `CanvasBars`, `CanvasLine`, `CanvasRing` sobre o `Canvas` 2D |
 
 Os primitivos (`Window`, `Label`, `Button`, `Input`, `Column`, `Row`,
 `View`, `Style`) continuam todos disponíveis — a biblioteca não esconde o
@@ -127,8 +135,8 @@ kof run "$OUT" --target=js
 ```
 
 Detalhes e estrutura: [`docs/install.md`](docs/install.md).
-Requisito: distribuição Kof com `Link/Image/Icon/Font` e captura box
-(agosto/2026+; recomendada a mais recente).
+Requisito: distribuição Kof **0.3.22-beta+** (primitivas visuais por
+widget, issue #78, e stdlib `kof.time/validation/strings/math`).
 
 ---
 
@@ -138,8 +146,8 @@ Requisito: distribuição Kof com `Link/Image/Icon/Font` e captura box
 |---------|----------|
 | [`docs/learn/`](docs/learn/00-intro.md) | capítulos numerados por família: como e quando usar |
 | [`docs/reference/api.md`](docs/reference/api.md) | todas as assinaturas e contratos |
-| [`docs/gaps.md`](docs/gaps.md) | limites honestos da plataforma (UIW001..UIW040) |
-| [`docs/targets.md`](docs/targets.md) | JVM / Native / KofJS |
+| [`docs/gaps.md`](docs/gaps.md) | limites honestos da plataforma (UIW001..UIW051) |
+| [`docs/targets.md`](docs/targets.md) | JS / JVM / Native |
 | [`docs/philosophy.md`](docs/philosophy.md) | as regras da casa |
 | [`docs/install.md`](docs/install.md) | inclusão no seu app |
 
@@ -151,19 +159,22 @@ existe*; `gaps.md` diz *o que ainda não dá*; `philosophy.md` diz *por quê*.
 # Testes
 
 ```bash
-scripts/test.sh     # todas as suítes: PASS por nome (alvo JVM)
-scripts/check.sh    # type-check da lib + exemplos
+scripts/test.sh              # todas as suítes: PASS por nome (alvo JS)
+TARGET=native scripts/test.sh  # handles no-op, sem DOM
+scripts/check.sh             # type-check da lib + exemplos
 ```
 
 Puras por valor exato; construção por fumaça (montar árvores inteiras não
-pode depender de pixels).
+pode depender de pixels). A construção de DOM real é provada no Chrome via
+`scripts/browser-tests.mjs` — o runner headless tem as regressões
+UIW050/UIW051 ([gaps.md](docs/gaps.md)).
 
 ---
 
 # Princípios
 
 1. Cada widget é uma intenção com nome
-2. Zero mecanismo novo — só os oito primitivos do kof.ui
+2. Zero mecanismo novo — só os primitivos do kof.ui
 3. Lógica pura primeiro, pixel depois — e a pura entra na suíte
 4. Convenção > configuração: um tema, zero builders
 5. Limites honestos: gaps documentados com código, nunca fake idioms

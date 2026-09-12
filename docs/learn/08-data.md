@@ -65,8 +65,8 @@ avatarInitials(name): String     // pura: iniciais das duas primeiras palavras
 avatarColor(name): Int           // pura: cor estável por comprimento do nome
 ```
 
-Círculo (raio 999) com as iniciais. Sem conversão maiúscula na plataforma —
-as iniciais saem como escritas (gap UIW040).
+Círculo (raio 999) com as iniciais em **caixa alta** — via
+`String.toUpperCase()` da plataforma (UIW040 fechado).
 
 ## Empty
 

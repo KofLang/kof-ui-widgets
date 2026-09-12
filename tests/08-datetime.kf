@@ -1,4 +1,4 @@
-// 08-datetime — Sakamoto contra âncoras conhecidas + grade exata.
+// 08-datetime — calendário kof.time contra âncoras conhecidas + grade exata.
 
 test "dayOfWeek âncoras históricas" {
     assert(dayOfWeek(1970, 1, 1) == 4, "epoch: quinta")
@@ -20,6 +20,13 @@ test "isLeapYear" {
     assert(isLeapYear(1900) == false, "centena não-bissexta")
     assert(isLeapYear(2000), "quatrocentos é bissexto")
     assert(isLeapYear(2026) == false, "ano comum")
+}
+
+test "isWeekend marca sábado e domingo" {
+    assert(isWeekend(2026, 8, 1), "1/ago/2026 é sábado")
+    assert(isWeekend(2026, 8, 2), "2/ago/2026 é domingo")
+    assert(isWeekend(2026, 8, 3) == false, "3/ago/2026 é segunda")
+    assert(isWeekend(2026, 8, 7) == false, "7/ago/2026 é sexta")
 }
 
 test "mês anterior e próximo" {

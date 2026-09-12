@@ -43,8 +43,8 @@ test "timelineText encadeia" {
 }
 
 test "avatarInitials" {
-    assert(avatarInitials("mel silva") == "ms", "duas palavras")
-    assert(avatarInitials("kof") == "k", "uma palavra")
+    assert(avatarInitials("mel silva") == "MS", "duas palavras em caixa alta")
+    assert(avatarInitials("kof") == "K", "uma palavra em caixa alta")
     assert(avatarInitials("") == "?", "vazio")
     assert(avatarInitials("  ") == "?", "só espaços")
 }

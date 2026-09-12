@@ -8,10 +8,27 @@ valores. `Int` de widget atravessa funções livremente; operações de membro
 
 ## Primitivos da plataforma usados/integrados
 
-Desde o update do Kof: `Link(text, url)`, `Image(src)`, `Icon(name[, size])`
-e `Font(family, size[, bold])` + `.setFont(font)` em Label/Button/Input/
-View/Link. A biblioteca integra Font (`Code`, `DataTable` em monospace);
-Link é plataforma pura — não duplicamos intenção que já existe.
+**Baseline: Kof 0.3.22-beta.** A biblioteca compõe o que a plataforma expõe
+— não reimplementa (R2):
+
+- **Widgets**: `Link(text, url)`, `Image(src)`, `Icon(name[, size])`,
+  `Textarea`, `Select(options)`, `Form(children)`, `Fieldset`, `Ul/Ol`,
+  `Table`, `Iframe/Video/Audio/Hr`, `Canvas`.
+- **Fonte**: `Font(family, size[, bold])` + `.setFont(font)` em
+  Label/Button/Input/View/Link. `Code`/`DataTable` usam monospace.
+- **Eventos** (UI006): `.on(type, handler)` em qualquer widget DOM;
+  `Event.key/value/x/y/target/relatedTarget/stopPropagation`.
+- **Estado** (Fase 8): `Store(initial)` com `.get()/.set(v)/.subscribe(f)`;
+  `Component` com `view`/`state`/`stateSet`/`onMount`/`onDispose`/`effect`.
+- **Navegação** (Fase 7): `Router.route/go/replace/back/forward/param/
+  current/depth`.
+- **Layout** (Fase 4): `Box/Stack/Spacer/Wrap/Grid/Center/Align`.
+- **Primitivas visuais** (issue #78): `setBorder(color, w)`,
+  `setShadow(color, offsetY, blur)`, `setGradient(a, b, angle)`,
+  `setFlexBasis(px)`, `setMaxWidth(px)` em qualquer widget DOM (no-op
+  JVM/Native; reais no KofJS).
+- **stdlib**: `time.*` (calendário), `math.*`, `strings.*`, `validation.*`
+  — a biblioteca delega e mantém só o contrato da casa.
 
 ## 00-core
 
@@ -32,8 +49,11 @@ Link é plataforma pura — não duplicamos intenção que já existe.
 |------------|---------|
 | `Heading(t) / Subheading(t) / Text(t) / Muted(t) / Code(t) / Link(l)` | Int (Label) |
 | `Quote(t)` | Int (View com barra) |
-| `Section(title) / Card(title)` | Int (View; aceita mais binds) |
+| `Section(title) / Card(title)` | Int (View com elevação) |
 | `Panel(content: Int)` | Int (View moldurada) |
+| `Hero(title, subtitle)` | Int (View com gradiente) |
+| `Content(maxWidth, child: Int)` | Int (View com max-width) |
+| `Fill(child: Int)` | Int (View flex) |
 | `VSpace(px) / HSpace(px) / Divider()` | Int |
 | `Badge(text) / Chip(text)` | Int |
 | `Tag(text, color: Int)` | Int |
@@ -92,15 +112,18 @@ Link é plataforma pura — não duplicamos intenção que já existe.
 | `ListView(items, numbered)` / `listText(i, n)` | Int / String |
 | `Timeline(events)` / `timelineText(e)` | Int / String |
 | `StatCard(label, value, trend)` | StatCardParts |
-| `Avatar(name)` / `avatarInitials(n) / avatarColor(n)` | AvatarParts / puras |
+| `Avatar(name)` / `avatarInitials(n) / avatarColor(n)` | AvatarParts / puras (iniciais em caixa alta) |
 | `Empty()` / `EmptyState.EMPTY_TEXT` | Int / String |
 
 ## 08-datetime
 
+O calendário civil vem de `kof.time` (`dayOfWeek` ISO convertido para
+0=domingo; `isLeapYear`/`daysInMonth`/`isWeekend`).
+
 | Assinatura | Devolve |
 |------------|---------|
 | `Calendar(year, month)` / `monthGrid(y, m)` | Int / String |
-| `dayOfWeek(y,m,d) / daysInMonth(y,m) / isLeapYear(y)` | puras |
+| `dayOfWeek(y,m,d) / daysInMonth(y,m) / isLeapYear(y) / isWeekend(y,m,d)` | puras |
 | `prevMonth(m) / nextMonth(m)` | puras |
 | `DatePicker() / TimePicker()` | PickerParts |
 | `DateState.year/.month/.day` · `TimeState.hour/.minute` | leitura externa |
@@ -124,3 +147,32 @@ Link é plataforma pura — não duplicamos intenção que já existe.
 | `FilePicker(label)` | FilePickerParts |
 | `FilePickerState.loadedPath` | String |
 | `filePreview(content)` | String (5 linhas + rodapé) |
+
+## 11-design
+
+| Assinatura | Devolve |
+|------------|---------|
+| `CurrentTheme() / useDarkTheme(dark)` | Theme / void |
+| `SurfaceColor() / SecondaryColor() / BackgroundColor() / MutedColor()` | Int (Color) |
+| `StyledText(t, style) / DisplayText(t) / BodyText(t) / Caption(t)` | Int (Label) |
+| `Surface(children, bg, fg, padding, radius)` | Int (View) |
+| `ContentCard(title, description, children)` | Int (View) |
+| `ColorSwatch(name, color)` | Int (View) |
+| `shadowOffset(level) / shadowBlur(level) / shadowAlpha(level)` | Int (puras) |
+| `ShadowColor(level)` | Int (Color) |
+| `Elevate(view, level) / Outline(view, color, width)` | Int (View) |
+| `formatMoney(cents, symbol) / formatPercent(v, total) / formatDate(y,m,d) / zeroPad(v,w)` | String |
+
+## 12-inputs · 13-canvas
+
+| Assinatura | Devolve |
+|------------|---------|
+| `InputField(caption, placeholder, type)` | FieldParts (root/input/hint) |
+| `PasswordField(caption)` | FieldParts |
+| `MultilineField(caption, placeholder)` | MultilineParts (Textarea) |
+| `SelectField(caption, options)` | SelectParts |
+| `RangeField(caption, initial)` | FieldParts |
+| `Counter(caption, initial)` | Component (estado reativo) |
+| `CanvasBars(labels, values, color)` | Canvas |
+| `CanvasLine(values, color) / CanvasRing(percent, color)` | Canvas |
+| `chartMax(values) / chartHeight(v, max, h)` | puras |

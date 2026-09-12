@@ -1,12 +1,15 @@
 // 03-forms.kf — campos de formulário e validação.
 //
-// A plataforma não tem evento de teclado: o valor do Input é lido quando
-// a ação roda (clique). TextField sincroniza para fora via botão ↻ e via
-// leitura direta do input capturado no seu próprio escopo.
+// Eventos são reais no alvo JS: `.on("input", (e: Event) -> ...)` entrega o
+// valor digitado (UI006) — o TextField já sincroniza ao vivo. O botão ↻
+// continua como leitura explícita, para quem prefere o clique.
 //
 // Multi-instância: cada TextField criado compartilha TextFieldState
 // (limite alpha documentado). Para campos independentes, crie os Inputs
 // direto e leia com input.text() — docs/learn/04-forms.md mostra a receita.
+//
+// Validação: os predicados genéricos vêm de `kof.validation`; a biblioteca
+// só compõe o resumo para o formulário.
 
 class TextFieldState {
     static String value = ""
@@ -32,35 +35,25 @@ TextField(String caption, String placeholder): TextFieldParts {
 }
 
 // ---- Validação (pura — testável em todos os alvos) ---------------------------
+//
+// kof.validation cobre os predicados genéricos (minLength/maxLength/isEmail/
+// isUrl/matches/isInt/...). A biblioteca reexporta os que o formulário usa,
+// para o app não precisar importar dois namespaces.
 
 isBlank(String s): Bool {
     return s == ""
 }
 
 minLength(String s, Int n): Bool {
-    return s.length >= n
+    return validation.minLength(s, n)
 }
 
 maxLength(String s, Int n): Bool {
-    return s.length <= n
+    return validation.maxLength(s, n)
 }
 
 isEmail(String s): Bool {
-    if (s.length < 5) {
-        return false
-    }
-    if (!s.contains("@")) {
-        return false
-    }
-    if (!s.contains(".")) {
-        return false
-    }
-    if (s.charAt(0) == '@') {
-        return false
-    }
-    var at = indexOf(s, "@")
-    var dot = indexOf(s, ".")
-    return at < dot && at > 0 && dot < s.length - 1
+    return validation.isEmail(s)
 }
 
 isNumber(String s): Bool {
@@ -78,19 +71,12 @@ isNumber(String s): Bool {
     return true
 }
 
+// posição da agulha (contrato da casa: agulha vazia é ausente).
 indexOf(String s, String needle): Int {
-    var n = needle.length
-    if (n == 0 || n > s.length) {
+    if (needle.length == 0) {
         return -1
     }
-    var i = 0
-    while (i <= s.length - n) {
-        if (s.substring(i, i + n) == needle) {
-            return i
-        }
-        i = i + 1
-    }
-    return -1
+    return s.indexOf(needle)
 }
 
 // resumo de validação: lista de erros -> texto para o label do formulário.

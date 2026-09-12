@@ -2,7 +2,8 @@
 
 ## Requisito
 
-Uma distribuição Kof com `kof.ui` (≥ 0.0.14-alpha):
+Uma distribuição Kof com `kof.ui` e as primitivas visuais por widget
+(**≥ 0.3.22-beta**, issue #78):
 
 ```bash
 kof version
@@ -21,7 +22,7 @@ kof run "$OUT" --target=js
 ```
 
 A ordem dos módulos é a ordem dos prefixos numéricos (`00-core.kf` →
-`10-io.kf`) — determinística e legível.
+`13-canvas.kf`) — determinística e legível.
 
 ### 2. Colar
 
@@ -43,12 +44,12 @@ Os scripts usam o `kof` do `PATH`; para outro binário:
 ```
 kof-ui-widgets/
 ├── README.md               # visão geral e quick start
-├── VERSION                 # 0.3.0-alpha (convenção do Kof)
+├── VERSION                 # 0.4.0-alpha (convenção do Kof)
 ├── LICENSE                 # BSD 3-Clause
 ├── src/                    # a biblioteca: uma família por arquivo
 │   ├── 00-core.kf          #   App, cores, helpers puros
 │   ├── 01-typography.kf    #   texto nos três níveis + variações
-│   ├── 02-layout.kf        #   Section/Panel/Card, respiro, marcadores
+│   ├── 02-layout.kf        #   Section/Panel/Card/Hero/Content/Fill
 │   ├── 03-forms.kf         #   TextField + validação pura
 │   ├── 04-choices.kf       #   Checkbox/ToggleSwitch/RadioGroup/Rating
 │   ├── 05-navigation.kf    #   Tabs/Accordion/Pagination/Navbar/SearchBox
@@ -56,7 +57,10 @@ kof-ui-widgets/
 │   ├── 07-data.kf          #   DataTable/TreeView/ListView/StatCard/Avatar
 │   ├── 08-datetime.kf      #   Calendar/DatePicker/TimePicker
 │   ├── 09-charts.kf        #   Sparkline/Bars/Donut/Gauge/progressBar
-│   └── 10-io.kf            #   FilePicker com preview
+│   ├── 10-io.kf            #   FilePicker com preview
+│   ├── 11-design.kf        #   tema, superfícies, elevação/sombra
+│   ├── 12-inputs.kf        #   campos compostos + Counter reativo
+│   └── 13-canvas.kf        #   Canvas 2D: barras, linha, anel
 ├── examples/               # programas completos: hello, perfil, tarefas,
 │                           # dashboard, files
 ├── tests/                  # suíte por família (test "nome" { assert })

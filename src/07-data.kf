@@ -81,7 +81,9 @@ totalWidth(List<Int> widths): Int {
     return t
 }
 
-// split próprio: a plataforma não tem String.split.
+// split que PRESERVA célula vazia à direita ("a;" -> ["a", ""]) — o
+// String.split da plataforma remove trailing empties (contrato Java), o que
+// quebraria CSV com campo final vazio. Separador vazio é erro de contrato.
 split(String s, String sep): List<String> {
     if (sep.length == 0) { throw "split: separador vazio" }
     var parts = listOf<String>()
@@ -127,19 +129,12 @@ treeLine(String path): String {
     return indent + "• " + name
 }
 
+// última posição (contrato da casa: agulha vazia é ausente).
 lastIndexOf(String s, String needle): Int {
-    var n = needle.length
-    if (n == 0 || n > s.length) {
+    if (needle.length == 0) {
         return -1
     }
-    var i = s.length - n
-    while (i >= 0) {
-        if (s.substring(i, i + n) == needle) {
-            return i
-        }
-        i = i - 1
-    }
-    return -1
+    return s.lastIndexOf(needle)
 }
 
 // ---- ListView ------------------------------------------------------------------------------
@@ -230,10 +225,10 @@ avatarInitials(String name): String {
     var first = substringN(trimmed, 0, 1)
     var space = indexOf(trimmed, " ")
     if (space < 0) {
-        return first
+        return first.toUpperCase()
     }
     var second = substringN(trimmed, space + 1, space + 2)
-    return first + second
+    return (first + second).toUpperCase()
 }
 
 avatarColor(String name): Color {

@@ -14,9 +14,11 @@ no JS o gap da plataforma aparece no preview ([gaps.md](gaps.md), UIW031).
 
 Consequências práticas:
 
-1. **Lógica em JVM, tela em JS.** Funções puras são idênticas nos três
-   alvos — `scripts/test.sh` roda tudo em JVM, rápido. Pixels só quando
-   você quiser ver.
+1. **Lógica em JS, tela no browser.** Funções puras são idênticas nos três
+   alvos — `scripts/test.sh` roda a suíte no alvo JS (rápido). A construção
+   de DOM é provada no Chrome (`scripts/browser-tests.mjs`); o runner
+   headless tem os gaps UIW050/UIW051 ([gaps.md](gaps.md)). Pixels só
+   quando você quiser ver.
 2. **Fechar TODAS as janelas encerra o programa** no alvo JS. Overlays
    abrem janelas próprias: fechá-las não encerra o app enquanto a principal
    ficar.
@@ -25,10 +27,12 @@ Consequências práticas:
 ## Testes por alvo
 
 ```bash
-scripts/test.sh                                  # todas as suítes (JVM)
+scripts/test.sh                                  # todas as suítes (alvo JS)
+TARGET=native scripts/test.sh                    # handles no-op (sem DOM)
 kof test .build/test-09-charts.kf --target js    # qualquer suíte no KofJS
 ```
 
-Cada família tem suíte própria em `tests/`; os testes de construção montam
-árvores completas — passam em JVM/Native porque construir e vincular são
-no-ops fora do JS.
+Cada família tem suíte própria em `tests/`. Os testes de construção montam
+árvores completas; no JVM/Native os handles são no-op (tudo passa), no JS
+headless os primitivos de DOM (fonte, `setName`, texto no Canvas) esbarram
+no stub — a prova de DOM é no browser.

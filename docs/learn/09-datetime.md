@@ -2,9 +2,12 @@
 
 `src/08-datetime.kf`
 
-Toda a lógica de data é função pura baseada no algoritmo de Sakamoto — os
-testes afirmam âncoras históricas (`24/ago/2026 == segunda`,
-`1/jan/1970 == quinta`) antes de qualquer pixel existir.
+O calendário civil vem de `kof.time` (S7-wedge, paridade JVM/JS/Native):
+`time.dayOfWeek` (ISO), `time.isLeapYear`, `time.daysInMonth`,
+`time.isWeekend`. A biblioteca só converte para o contrato da casa
+(0=domingo) — não reimplementa a plataforma. Os testes afirmam âncoras
+históricas (`24/ago/2026 == segunda`, `1/jan/1970 == quinta`) antes de
+qualquer pixel existir.
 
 ## Calendar
 
@@ -13,6 +16,7 @@ Calendar(Int year, Int month): Int        // grade estática
 monthGrid(year, month): String            // pura
 dayOfWeek(y, m, d): Int                   // pura: 0=domingo .. 6=sábado
 daysInMonth(y, m) / isLeapYear(y)         // puras
+isWeekend(y, m, d): Bool                  // pura (sábado/domingo)
 prevMonth(m) / nextMonth(m)               // puras: wrap 12↔1
 ```
 

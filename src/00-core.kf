@@ -76,32 +76,19 @@ TextColor(): Color {
 // ---- Texto puro -------------------------------------------------------------
 
 // repete `piece` n vezes — base de barras, skeletons e grids.
+// A plataforma já tem strings.repeat (n<=0 => "").
 repeat(String piece, Int n): String {
-    var out = ""
-    var i = 0
-    while (i < n) {
-        out = out + piece
-        i = i + 1
-    }
-    return out
+    return strings.repeat(piece, n)
 }
 
 // completa com espaços à direita até `width` (tabelas, colunas).
 padEnd(String s, Int width): String {
-    var out = s
-    while (out.length < width) {
-        out = out + " "
-    }
-    return out
+    return strings.padRight(s, width, " ")
 }
 
 // completa com espaços à esquerda até `width` (números alinhados).
 padStart(String s, Int width): String {
-    var out = s
-    while (out.length < width) {
-        out = " " + out
-    }
-    return out
+    return strings.padLeft(s, width, " ")
 }
 
 // trunca com reticências quando passa de `width`.
@@ -131,15 +118,7 @@ substringN(String s, Int start, Int end): String {
 // conta ocorrências de um caractere (um char = string de 1).
 countChar(String s, String ch): Int {
     if (ch.length == 0) { return 0 }
-    var n = 0
-    var i = 0
-    while (i < s.length) {
-        if (s.charAt(i) == ch.charAt(0)) {
-            n = n + 1
-        }
-        i = i + 1
-    }
-    return n
+    return strings.count(s, ch)
 }
 
 // junta uma lista com separador (breadcrumbs, menus).
@@ -159,13 +138,7 @@ join(List<String> parts, String sep): String {
 // ---- Números puros ------------------------------------------------------------
 
 clamp(Int v, Int min, Int max): Int {
-    if (v < min) {
-        return min
-    }
-    if (v > max) {
-        return max
-    }
-    return v
+    return math.clamp(v, min, max)
 }
 
 // wrap-around: avança voltando ao início (carrosséis, relógios).
