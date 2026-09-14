@@ -23,7 +23,9 @@ compondo os primitivos do [`kof.ui`](https://github.com/KofLang/Kof4j/blob/main/
 `setFlexBasis`/`setMaxWidth`, issue #78) e a stdlib (`kof.time`,
 `kof.validation`, `kof.strings`, `kof.math`).
 
-**Baseline:** Kof **0.3.22-beta**. Versão da lib: `0.4.0-alpha`.
+**Baseline:** Kof **0.4.0-beta** (primitivas visuais por widget, issue #78,
+e as regressões UIW050/UIW051 fechadas; UIW052 na linha `beta-0.4.0`).
+Versão da lib: `0.4.0-alpha`.
 
 ---
 
@@ -135,8 +137,9 @@ kof run "$OUT" --target=js
 ```
 
 Detalhes e estrutura: [`docs/install.md`](docs/install.md).
-Requisito: distribuição Kof **0.3.22-beta+** (primitivas visuais por
-widget, issue #78, e stdlib `kof.time/validation/strings/math`).
+Requisito: distribuição Kof **0.4.0-beta+** (primitivas visuais por
+widget, issue #78, stdlib `kof.time/validation/strings/math`, e as
+regressões UIW050/UIW051 fechadas).
 
 ---
 
@@ -146,7 +149,7 @@ widget, issue #78, e stdlib `kof.time/validation/strings/math`).
 |---------|----------|
 | [`docs/learn/`](docs/learn/00-intro.md) | capítulos numerados por família: como e quando usar |
 | [`docs/reference/api.md`](docs/reference/api.md) | todas as assinaturas e contratos |
-| [`docs/gaps.md`](docs/gaps.md) | limites honestos da plataforma (UIW001..UIW051) |
+| [`docs/gaps.md`](docs/gaps.md) | limites honestos da plataforma (UIW001..UIW052) |
 | [`docs/targets.md`](docs/targets.md) | JS / JVM / Native |
 | [`docs/philosophy.md`](docs/philosophy.md) | as regras da casa |
 | [`docs/install.md`](docs/install.md) | inclusão no seu app |
@@ -165,9 +168,9 @@ scripts/check.sh             # type-check da lib + exemplos
 ```
 
 Puras por valor exato; construção por fumaça (montar árvores inteiras não
-pode depender de pixels). A construção de DOM real é provada no Chrome via
-`scripts/browser-tests.mjs` — o runner headless tem as regressões
-UIW050/UIW051 ([gaps.md](docs/gaps.md)).
+pode depender de pixels). A suíte roda verde nos três alvos (`TARGET=js`,
+`jvm`, `native`); a construção de DOM fina (pixels) é provada no Chrome via
+`scripts/browser-tests.mjs`.
 
 ---
 

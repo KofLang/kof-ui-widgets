@@ -50,7 +50,7 @@ PASS/FAIL por nome, sem abrir janela.
 ### 7. Limites honestos
 
 O que depende de mecanismo inexistente está em [gaps.md](gaps.md) com
-código (`UIW001..UIW051`) — documentado, nunca fingido. Quando a
+código (`UIW001..UIW052`) — documentado, nunca fingido. Quando a
 plataforma fecha um gap, o mecanismo entra como widget e o código migra
 para "fechados" — sem mudar a assinatura da casa.
 

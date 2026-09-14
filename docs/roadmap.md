@@ -5,7 +5,7 @@ Cada item depende de um gap documentado em [`gaps.md`](gaps.md) com código
 próprio — quando o Kof resolver o mecanismo, o componente entra no mesmo
 dia, mantendo a assinatura já prevista aqui.
 
-## Fechados na última atualização (Kof 0.3.22-beta / issue #78)
+## Fechados na última atualização (Kof 0.4.0-beta / issue #78)
 
 | Gap | Entrou |
 |-----|--------|
@@ -14,6 +14,8 @@ dia, mantendo a assinatura já prevista aqui.
 | UIW007 (textarea) | `MultilineField` sobre o `Textarea` da plataforma |
 | UIW030 (canvas) | família `13-canvas` (barras, linha, anel) |
 | UIW040 (case) | iniciais em caixa alta (`avatarInitials`) |
+| UIW050/UIW051 (regressões JVM/JS) | suíte headless verde nos 3 alvos |
+| UIW052 (assert falso no JS) | `assert` falha corretamente em `--target js` |
 | — | primitivas visuais: `Elevate`/`Outline` (setShadow/setBorder) |
 
 ## Próximos (dependentes de mecanismo)
@@ -27,7 +29,6 @@ dia, mantendo a assinatura já prevista aqui.
 | UIW008 (timer no JS) | Toast auto-dismiss, Spinner/Skeleton animados |
 | UIW020 (formatação de tempo) | Clock vivo, datas absolutas |
 | UIW031 (kof.io no JS) | FilePicker no browser |
-| UIW050/UIW051 (regressões) | suíte de construção headless verde de novo |
 
 ## Versionamento
 
@@ -35,6 +36,6 @@ dia, mantendo a assinatura já prevista aqui.
 API pode mudar entre minors; qualquer remoção é documentada em
 [`gaps.md`](gaps.md) antes de sair.
 
-A biblioteca declara a **baseline de plataforma** (hoje 0.3.22-beta) no
+A biblioteca declara a **baseline de plataforma** (hoje 0.4.0-beta) no
 [`README`](../README.md) e em [`gaps.md`](gaps.md): features novas dependem
 das primitivas daquela versão.

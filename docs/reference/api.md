@@ -8,7 +8,7 @@ valores. `Int` de widget atravessa funções livremente; operações de membro
 
 ## Primitivos da plataforma usados/integrados
 
-**Baseline: Kof 0.3.22-beta.** A biblioteca compõe o que a plataforma expõe
+**Baseline: Kof 0.4.0-beta.** A biblioteca compõe o que a plataforma expõe
 — não reimplementa (R2):
 
 - **Widgets**: `Link(text, url)`, `Image(src)`, `Icon(name[, size])`,

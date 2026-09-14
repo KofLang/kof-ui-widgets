@@ -3,7 +3,7 @@
 ## Requisito
 
 Uma distribuição Kof com `kof.ui` e as primitivas visuais por widget
-(**≥ 0.3.22-beta**, issue #78):
+(**≥ 0.4.0-beta**, issue #78):
 
 ```bash
 kof version
