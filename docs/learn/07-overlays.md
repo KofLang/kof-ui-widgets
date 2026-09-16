@@ -50,8 +50,12 @@ Tooltip(String term, String explanation): TooltipParts  // gatilho no fluxo
 ```
 
 A explicação nasce numa janela OCULTA durante a construção; clicar no
-gatilho (`term ?`) mostra. Hover não existe na plataforma (gap) — clique é
-a alternativa acessível.
+gatilho (`term ?`) mostra. A plataforma **tem** hover/pointer events
+(UIW002 — `.on("mouseenter"/"mouseleave"/"mousemove")`, ver
+`examples/showcase/interactions.kf`); o Tooltip escolhe **clique** por ser
+acessível (teclado/touch) e não abrir/fechar janela a cada mousemove. O
+upgrade para gatilho por hover é decisão de design (fila), não gap da
+plataforma.
 
 ## Toast
 
