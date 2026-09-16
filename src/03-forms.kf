@@ -92,3 +92,48 @@ validationSummary(List<String> errors): String {
     }
     return out
 }
+
+// ---- ReconfigButton (UIW001, 16/09) -------------------------------------------
+//
+// A plataforma agora PERMITE vincular ação depois de criar o handle:
+// `.on(type, handler)` fora da árvore de Component (UI006, `f0907c2`) e
+// `setText` pós-criação (#78) funcionam nos 3 alvos. Este widget é a prova
+// viva do mecanismo — um botão que troca o próprio rótulo e a própria ação
+// a cada clique (ligar/desligar sem recriar nada).
+//
+// O espelho `ReconfigState.on` reflete a ÚLTIMA instância clicada (contrato
+// dos mirrors); o visual depende só do botão. No JVM/Native os handlers não
+// disparam (no-op honesto) — a construção e a troca de rótulo seguem verdes.
+
+class ReconfigState {
+    static Bool on = false
+    static Int flips = 0
+}
+
+ReconfigButton(String labelOn, String labelOff, Int id): Button {
+    var state = false
+    var btn = Button(labelOff, () -> {})
+    btn.setId("reconfig-" + id)
+    btn.on("click", (e: Event) -> {
+        state = !state
+        ReconfigState.on = state
+        ReconfigState.flips = ReconfigState.flips + 1
+        if (state) { btn.setText(labelOn) }
+        else { btn.setText(labelOff) }
+    })
+    return btn
+}
+
+// Leitura/reset do espelho p/ oraculo de browser (dispatch de click real).
+reconfigIsOn(): Bool {
+    return ReconfigState.on
+}
+
+reconfigFlipCount(): Int {
+    return ReconfigState.flips
+}
+
+reconfigReset() {
+    ReconfigState.on = false
+    ReconfigState.flips = 0
+}

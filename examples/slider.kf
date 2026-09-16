@@ -1,0 +1,11 @@
+// Slider arrastável + ReconfigButton — a prova viva do mecanismo de ponteiro
+// (UIW005) e da vinculação pós-criação (UIW001). No browser (KofJS) o gesto é
+// real: arraste sobre o card move o polegar, clique no botão troca o rótulo.
+main() {
+    var w = App("Slider e ReconfigButton")
+    var vol = Slider("Volume", 0, 100, 5, 20)
+    var power = ReconfigButton("LIGADO", "desligado", 1)
+    w.bind(vol)
+    w.bind(power)
+    w.show()
+}

@@ -47,6 +47,87 @@ RangeField(String caption, Int initial): FieldParts {
     return field
 }
 
+// ---- Slider arrastável (UIW005, 16/09) ---------------------------------------
+//
+// O mecanismo de ponteiro da plataforma (mousedown/mousemove/mouseup +
+// Event.x() = clientX do DOM real — UI006/UIW002) chegou; o slider entra na
+// lib como transição PURA + cola de eventos no root do Component. O root do
+// Component sobrevive ao re-render (a view troca só os filhos), então os
+// handlers registrados uma vez no `on` seguem vivos para sempre.
+//
+// No browser: arrastar sobre o card move o polegar (re-render por estado).
+// No JVM/Native: os handlers nunca disparam (no-op honesto da plataforma) —
+// `SliderValue(...)` e os botões ± seguem funcionando em qualquer alvo.
+
+class SliderMirror {
+    static Int lastValue = 0
+}
+
+// Leitura do espelho: ÚLTIMA instância interagida (contrato dos mirrors).
+sliderLastValue(): Int {
+    return SliderMirror.lastValue
+}
+
+// Transição pura do arraste: valor = base + (delta de tela / px por passo)
+// * passo, dentro de [min,max]. Truncamento em direção a zero como no JVM.
+sliderValue(Int base, Int deltaPx, Int pxPerStep, Int min, Int max, Int step): Int {
+    var anchor = clamp(base, min, max)
+    if (pxPerStep <= 0 || step <= 0 || max <= min) {
+        return anchor
+    }
+    var span = (max - min) / step
+    var units = deltaPx / pxPerStep
+    if (units > span) {
+        units = span
+    }
+    if (units < 0 - span) {
+        units = 0 - span
+    }
+    return clamp(anchor + units * step, min, max)
+}
+
+// pixels de tela por passo de arraste (densidade do gesto).
+sliderPixelsPerStep(): Int {
+    return 4
+}
+
+Slider(String caption, Int min, Int max, Int step, Int initial): Component {
+    var component = Component(clamp(initial, min, max))
+    var dragging = false
+    var anchorX = 0
+    var anchorVal = 0
+    component.view((value: Int) -> {
+        var filled = 0
+        if (max > min) {
+            filled = ratioFill(value - min, max - min, 20)
+        }
+        return ContentCard(caption, "arraste sobre a barra (ou ±) — min " + min + ", max " + max + ", passo " + step, listOf(
+            DisplayText("" + value),
+            Label(repeat("█", filled) + repeat("░", 20 - filled)),
+            Row(listOf(
+                Button("−", () -> component.stateSet(clamp(component.state() - step, min, max))),
+                Button("+", () -> component.stateSet(clamp(component.state() + step, min, max)))
+            ))
+        ))
+    })
+    component.on("mousedown", (e: Event) -> {
+        dragging = true
+        anchorX = e.x()
+        anchorVal = component.state()
+    })
+    component.on("mousemove", (e: Event) -> {
+        if (dragging) {
+            var next = sliderValue(anchorVal, e.x() - anchorX, sliderPixelsPerStep(), min, max, step)
+            SliderMirror.lastValue = next
+            component.stateSet(next)
+        }
+    })
+    component.on("mouseup", (e: Event) -> {
+        dragging = false
+    })
+    return component
+}
+
 // Estado reativo nativo. Cada Counter possui seu próprio Component.
 Counter(String caption, Int initial): Component {
     var component = Component(initial)

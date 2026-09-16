@@ -54,11 +54,26 @@ estático nomeado, e a biblioteca documenta o contrato:
 O espelho reflete **a última instância interagida** — o visual nunca
 depende dele.
 
-## O que continua impossível
+## Vincular ação depois de criar (UIW001, 16/09)
 
-Vincular ação DEPOIS de criar o handle (self-capture na inicialização)
-segue sem suporte — nenhum componente atualiza o texto do próprio botão;
-todos usam irmão rebindável. Ver [`gaps.md`](../gaps.md), UIW001.
+Isto era impossível; **deixou de ser**. Um handle criado vive e aceita `.on`
+depois — o botão pode trocar o próprio texto ao clicar, sem irmão
+rebindável:
+
+```kof
+var btn = Button("desligado", () -> {})
+btn.on("click", (e: Event) -> btn.setText("LIGADO"))   // self-capture no handler
+```
+
+`ReconfigButton(labelOn, labelOff, id)` é o widget pronto desse padrão. A
+transição é puramente a antiga: um `Component` com `state`/`view` continua
+sendo a via para estado que outro código lê.
+
+Ressalva honesta (Kof4j §253 face A/B): a variante em que o handler lê a
+**var em declaração** — `var btn = Button(…, () -> btn.setText(…))`, o handler
+como 3º argumento do construtor — roda em jvm/js mas ainda **falha em native**
+(SEM092) até a face B fechar na lane nat. A forma acima (criar, depois
+`.on`) roda nos 3 alvos. Ver [`gaps.md`](../gaps.md), UIW001.
 
 ## Anti-padrões
 

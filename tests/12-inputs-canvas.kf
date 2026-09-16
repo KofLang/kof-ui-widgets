@@ -25,4 +25,39 @@ test "Canvas rejeita séries incompatíveis" {
     assert(rejected, "cada valor precisa de um rótulo")
 }
 
+// ---- Slider (UIW005) — transição pura, valores exatos nos 3 alvos ------------
+
+test "sliderValue mapeia delta de tela em passos" {
+    // arrasta 40px com 4px/passos -> +10 unidades * passo 5 = +50.
+    assert(sliderValue(50, 40, 4, 0, 100, 5) == 100, "40px -> max")
+    assert(sliderValue(50, 0 - 40, 4, 0, 100, 5) == 0, "-40px -> min")
+    assert(sliderValue(50, 16, 4, 0, 100, 5) == 70, "16px -> +20")
+    assert(sliderValue(30, 8, 4, 0, 100, 5) == 40, "metade de um passo truncada")
+}
+
+test "sliderValue satura e ignora subpasso" {
+    assert(sliderValue(50, 100000, 4, 0, 100, 5) == 100, "teto em max")
+    assert(sliderValue(50, 0 - 100000, 4, 0, 100, 5) == 0, "piso em min")
+    assert(sliderValue(50, 3, 4, 0, 100, 5) == 50, "menos de um passo nao anda")
+}
+
+test "sliderValue clampa a ancora e aceita configs degeneradas" {
+    assert(sliderValue(0 - 10, 20, 4, 0, 100, 5) == 25, "ancora abaixo do min sobe ao clamp")
+    assert(sliderValue(42, 40, 0, 0, 100, 5) == 42, "pxPerStep<=0 devolve a ancora")
+    assert(sliderValue(7, 100, 4, 0, 0, 5) == 0, "max<=min devolve a ancora clamped")
+    assert(sliderValue(9, 100, 4, 0, 100, 0) == 9, "step<=0 devolve a ancora")
+}
+
+test "Slider monta sem lancar em qualquer alvo (no-op em jvm/native)" {
+    var s = Slider("Volume", 0, 100, 5, 50)
+    assert(sliderPixelsPerStep() == 4, "densidade do gesto")
+}
+
+test "ReconfigButton monta e os espelhos comecam zerados (UIW001)" {
+    reconfigReset()
+    var b = ReconfigButton("LIGADO", "desligado", 1)
+    assert(reconfigIsOn() == false, "comeca desligado")
+    assert(reconfigFlipCount() == 0, "sem clique ainda")
+}
+
 main() { }

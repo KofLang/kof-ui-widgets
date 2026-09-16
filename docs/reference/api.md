@@ -71,6 +71,8 @@ valores.
 | `TextFieldState.value` | String (sincronizado pelo ↻) |
 | `isBlank(s) / minLength(s,n) / maxLength(s,n) / isEmail(s) / isNumber(s)` | Bool |
 | `validationSummary(errors: List<String>)` | String |
+| `ReconfigButton(labelOn, labelOff, id)` | Button — troca o próprio rótulo a cada clique (UIW001, 16/09) |
+| `ReconfigState.on / .flips` / `reconfigIsOn() / reconfigFlipCount() / reconfigReset()` | espelho da última instância clicada |
 
 ## 04-choices
 
@@ -182,6 +184,10 @@ O calendário civil vem de `kof.time` (`dayOfWeek` ISO convertido para
 | `SelectField(caption, options)` | SelectParts |
 | `RangeField(caption, initial)` | FieldParts |
 | `Counter(caption, initial)` | Component (estado reativo) |
+| `Slider(caption, min, max, step, initial)` | Component — arrastável via ponteiro no browser (UIW005, 16/09) |
+| `sliderValue(base, deltaPx, pxPerStep, min, max, step)` | Int (pura — transição do arraste) |
+| `sliderPixelsPerStep()` | Int (4 px por passo) |
+| `SliderMirror.lastValue` / `sliderLastValue()` | espelho do último valor arrastado |
 | `CanvasBars(labels, values, color)` | Canvas |
 | `CanvasLine(values, color) / CanvasRing(percent, color)` | Canvas |
 | `chartMax(values) / chartHeight(v, max, h)` | puras |

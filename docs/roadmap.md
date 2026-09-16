@@ -19,16 +19,16 @@ dia, mantendo a assinatura já prevista aqui.
 | UIW008 (timer no JS) | `time.interval`/`scheduler.every` + `cancel` nos 4 alvos (TIME001 fechado na plataforma 15/09); `ToastAutoDismiss(message, ms)`, `Clock()` e `Spinner(frames, ms)` entregam o auto-dismiss e a animação (Spinner se cancela via handle-sombra; o self-cancel canônico ainda trava no Kof4j §253). Skeleton animado segue pendente de design |
 | UIW020 (formatação de tempo) | `todayIso`/`formatDateIso`/`parseDateIso`/`addDays`/`diffDays` na stdlib + `clockTime(millis)`/`Clock()` na lib → relógio ao vivo real nos 3 alvos (no-op em JVM/Native, render no JS) |
 | — | primitivas visuais: `Elevate`/`Outline` (setShadow/setBorder) |
+| UIW031 (kof.io no JS) | **16/09** (`de9d5fc`): `readText`/`writeText`/`exists`/`size`/`readFile`/`writeFile` delegados ao host GraalJS — round-trip byte-parity nos 3 alvos; o `FilePicker` carrega no browser |
+| UIW001 (ação pós-criação) | **16/09**: `.on()` pós-criação (UI006) + `set*` (#78) nos 3 alvos → `ReconfigButton` (botão que troca o próprio rótulo ao clicar) e menus dinâmicos. Self-capture na declaração segue SEM092 no native (Kof4j §253 face B) |
+| UIW005 (drag-and-drop) | **16/09**: ponteiro real (mousedown/mousemove/mouseup + `Event.x()`) → `Slider` arrastável (transição pura `sliderValue`, verde nos 3 alvos; drag provado no Chrome). Kanban/reorder são widgets sobre o mesmo mecanismo, não gap de plataforma |
 
 ## Próximos (dependentes de mecanismo)
 
 | Quando resolver | Entra |
 |-----------------|-------|
-| UIW001 (ação pós-criação) | menus dinâmicos, botão reconfigurável |
 | UIW003 (theming pós-criação) | troca de tema global sem recriar janelas |
-| UIW005 (drag-and-drop) | Kanban, reorder de listas, Slider arrastável |
 | UIW006 (file dialog) | upload real |
-| UIW031 (kof.io no JS) | FilePicker no browser |
 
 ## Versionamento
 
