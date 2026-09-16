@@ -8,10 +8,45 @@
 //
 // Relógio ao vivo: deixou de ser gap de plataforma (UIW020 fechado 15/09 —
 // datas ISO na stdlib, aritmética de Long no `time.now()` roda nos 3 alvos,
-// timer do UIW008 disponível). Entrará como transição pura + widget quando
-// a lib quiser o relógio vivo do roadmap.
+// timer do UIW008 disponível). Entrou: `clockTime`/`spinnerFrame` (puras,
+// travadas em âncoras absolutas) + `Clock`/`Spinner` (vivos; o Spinner para
+// sozinho via handle-sombra). setText é no-op em JVM/Native — a prova é a
+// transição pura nos 3 alvos.
 
 record PickerParts(View root)
+
+// ---- relógio + spinner (UIW008/UIW020 fechados) ---------------------------------------
+//
+// Transições puras primeiro (regra da casa): clockTime/spinnerFrame não
+// tocam em relógio nem handle — são provadas por valor exato em âncoras
+// históricas. Os widgets vivos só colam a transição ao timer.
+
+// zero-pad de 2 digitos — padStart da casa preenche com ESPACO, o que
+// quebraria o relogio (e ja quebrava o timeLabel, que a doc prometia
+// "09:15 zero-empilhado").
+pad2(Int v): String {
+    if (v < 10) {
+        return "0" + str(v)
+    }
+    return str(v)
+}
+
+// epoch millis (UTC) -> "HH:MM:SS". Aritmética em Long; os campos ficam
+// < 60/24, então o cast Long->Int é exato (nada estoura o Int).
+clockTime(Long millis): String {
+    var secs = millis / 1000
+    var s = (secs % 60) as Int
+    var m = ((secs / 60) % 60) as Int
+    var h = ((secs / 3600) % 24) as Int
+    return pad2(h) + ":" + pad2(m) + ":" + pad2(s)
+}
+
+// quadro do spinner a partir de um passo (wrap em 8; o passo vem de um
+// contador interno, nunca negativo — `%` de inteiro simples basta).
+spinnerFrame(Int step): String {
+    var frames = listOf("⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧")
+    return frames.get(step % 8)
+}
 
 // ---- calendário civil (kof.time) ----------------------------------------------------
 //
@@ -174,5 +209,46 @@ TimePicker(): PickerParts {
 }
 
 timeLabel(): String {
-    return padStart(str(TimeState.hour), 2) + ":" + padStart(str(TimeState.minute), 2)
+    return pad2(TimeState.hour) + ":" + pad2(TimeState.minute)
+}
+
+// ---- Clock / Spinner (vivos: timer do UIW008) ----------------------------------------
+
+// Relógio UTC ao vivo: "YYYY-MM-DD HH:MM:SS", atualizado a cada segundo.
+// A data vem de `time.todayIso()` (stdlib — R2, nada de inversa civil na
+// lib); a hora de `clockTime`. Sem cancel: vive com o app (hangprobe: jobs
+// recorrentes sem cancel não impedem o processo de encerrar em nenhum alvo).
+// Em JVM/Native o setText é no-op (sem render) — a transição pura é a prova.
+Clock(): Label {
+    var view = Label(time.todayIso() + " " + clockTime(time.now()))
+
+    time.interval(1000, () -> {
+        view.setText(time.todayIso() + " " + clockTime(time.now()))
+    })
+    var vh = view
+    return vh
+}
+
+// Spinner de `frames` quadros braille a cada `ms` milissegundos; para
+// sozinho (handle-sombra — o job nunca lê a var do próprio interval,
+// Kof4j §253). frames <= 0 mostra o primeiro quadro parado.
+Spinner(Int frames, Int ms): Label {
+    var view = Label(spinnerFrame(0))
+    if (frames <= 0) {
+        var vh0 = view
+        return vh0
+    }
+    var step = 0
+    var myId = ""
+    var id = time.interval(ms, () -> {
+        if (step < frames) {
+            step = step + 1
+            view.setText(spinnerFrame(step))
+        } else if (myId.length > 0) {
+            time.cancel(myId)
+        }
+    })
+    myId = id
+    var vh = view
+    return vh
 }

@@ -58,5 +58,28 @@ test "pickers constroem" {
     w.bind(tp.root())
 }
 
+test "clockTime âncoras absolutas (UTC)" {
+    assert(clockTime(0) == "00:00:00", "epoch")
+    assert(clockTime(3661000) == "01:01:01", "1h1m1s")
+    assert(clockTime(1757900000000) == "01:33:20", "âncora 2025-09-15")
+    assert(clockTime(86399000) == "23:59:59", "fim do dia")
+}
+
+test "spinnerFrame wrap" {
+    assert(spinnerFrame(0) == "⠋", "primeiro")
+    assert(spinnerFrame(1) == "⠙", "segundo")
+    assert(spinnerFrame(8) == "⠋", "wrap")
+    assert(spinnerFrame(9) == "⠙", "wrap+1")
+}
+
+test "Clock e Spinner constroem (no-op em JVM/Native)" {
+    var c = Clock()
+    var s = Spinner(8, 10)
+    time.sleep(40)
+    // JS renderiza (ISO+hora = 19; braille = 1 char); JVM/Native = "" no-op.
+    assert(c.text().length == 0 || c.text().length == 19, "relogio: " + c.text())
+    assert(s.text().length == 0 || s.text().length == 1, "quadro: " + s.text())
+}
+
 main() {
 }

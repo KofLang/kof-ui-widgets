@@ -123,12 +123,15 @@ O calendário civil vem de `kof.time` (`dayOfWeek` ISO convertido para
 
 | Assinatura | Devolve |
 |------------|---------|
-| `Calendar(year, month)` / `monthGrid(y, m)` | Int / String |
+| `Calendar(year, month)` / `monthGrid(y, m)` | Label / String |
 | `dayOfWeek(y,m,d) / daysInMonth(y,m) / isLeapYear(y) / isWeekend(y,m,d)` | puras |
 | `prevMonth(m) / nextMonth(m)` | puras |
 | `DatePicker() / TimePicker()` | PickerParts |
 | `DateState.year/.month/.day` · `TimeState.hour/.minute` | leitura externa |
 | `timeLabel()` | String ("09:15") |
+| `clockTime(millis: Long)` | String ("HH:MM:SS", pura, UTC) |
+| `spinnerFrame(step: Int)` | String (braille, wrap 8, pura) |
+| `Clock()` / `Spinner(frames, ms)` | Label (vivos — UIW008; Spinner se cancela, Clock não) |
 
 ## 09-charts
 

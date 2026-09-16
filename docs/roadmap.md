@@ -16,8 +16,8 @@ dia, mantendo a assinatura já prevista aqui.
 | UIW040 (case) | iniciais em caixa alta (`avatarInitials`) |
 | UIW050/UIW051 (regressões JVM/JS) | suíte headless verde nos 3 alvos |
 | UIW052 (assert falso no JS) | `assert` falha corretamente em `--target js` |
-| UIW008 (timer no JS) | `time.interval`/`scheduler.every` + `cancel` nos 4 alvos (TIME001 fechado na plataforma 15/09); `ToastAutoDismiss(message, ms)` entrega o auto-dismiss (Spinner/Skeleton animados: agora é trabalho da lib, não gap de plataforma — trava só no self-cancel §253, contornado com handle-sombra) |
-| UIW020 (formatação de tempo) | `todayIso`/`formatDateIso`/`parseDateIso`/`addDays`/`diffDays` na stdlib; `Str` + `time.now()` concatenable → relógio ao vivo viável com o timer do UIW008 |
+| UIW008 (timer no JS) | `time.interval`/`scheduler.every` + `cancel` nos 4 alvos (TIME001 fechado na plataforma 15/09); `ToastAutoDismiss(message, ms)`, `Clock()` e `Spinner(frames, ms)` entregam o auto-dismiss e a animação (Spinner se cancela via handle-sombra; o self-cancel canônico ainda trava no Kof4j §253). Skeleton animado segue pendente de design |
+| UIW020 (formatação de tempo) | `todayIso`/`formatDateIso`/`parseDateIso`/`addDays`/`diffDays` na stdlib + `clockTime(millis)`/`Clock()` na lib → relógio ao vivo real nos 3 alvos (no-op em JVM/Native, render no JS) |
 | — | primitivas visuais: `Elevate`/`Outline` (setShadow/setBorder) |
 
 ## Próximos (dependentes de mecanismo)
