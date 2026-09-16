@@ -1,8 +1,9 @@
-// 10-io.kf — file picker com preview.
-//
-// Combina Input (caminho) + botão carregar + preview via kof.io.
-// kof.io roda em JVM e Native; no alvo JS é gap da plataforma (o resto do
-// componente funciona: a leitura reporta o erro no preview).
+ // 10-io.kf — file picker com preview.
+ //
+ // Combina Input (caminho) + botão carregar + preview via kof.io.
+ // kof.io roda nos 3 alvos (JVM/Native/JS — o JS delega para o host
+ // GraalJS, `kof_platform.readText/writeText/exists/size`, byte-parity com
+ // JVM/Native; UIW031 fechado 16/09).
 
 class FilePickerState {
     static String loadedPath = ""

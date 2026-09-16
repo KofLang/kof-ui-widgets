@@ -9,8 +9,8 @@ os alvos; quem não consegue executá-la diz isso na hora.**
 | **JVM** | handles no-ops — compila e executa, nada desenha | `--target=jvm` |
 | **Native** | handles no-ops — idem JVM | `--target=native` |
 
-Exceção parcial: `FilePicker` depende de kof.io — leitura em JVM/Native;
-no JS o gap da plataforma aparece no preview ([gaps.md](gaps.md), UIW031).
+`FilePicker` depende de kof.io — que roda nos 3 alvos (o JS delega ao host
+GraalJS, byte-parity; UIW031 fechado 16/09).
 
 Consequências práticas:
 

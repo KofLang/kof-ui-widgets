@@ -26,6 +26,7 @@ com código de gap — nunca fingido na API.
 | UIW052 | no JS um `Bool` é `true`/`false` real, mas o teste de "falso" do `assert` emitia `(cond === 0)` — sempre `false` → **um assert falso PASSAVA** (escondia falha de teste) | `beta-0.4.0` (`JsComparisons`, §186): `EQ 0` → `!left` (contraparte do `NE 0` → truthiness). Um `assert(1 == 2)` agora falha corretamente em `--target js` |
 | UIW008 | timer só na JVM (`time.*` reportava TIME001 fora dela — e é onde não há render) | **0.4.0-beta / 15/09**: `TIME001` fechado na plataforma nos 4 alvos — `time.interval`/`scheduler.every` + `cancel` rodam no browser (via `setInterval` real) e no headless (fila cooperativa bombeada por `time.sleep`). Nasce `ToastAutoDismiss(message, ms)`. Ressalva honesta: o idiom canônico de self-cancel `var id = time.interval(…, () -> { time.cancel(id) })` ainda trava (Kof4j **§253** — SEM011 na var do próprio interval; SIGSEGV no native ao lê-la dentro do job); a lib cancela via **handle-sombra** (o job lê uma Str capturada comum, verde nos 3 alvos) — ver `06-overlays` |
 | UIW020 | `time.now()` Long sem conversão Long→Int nem formatação; datas absolutas inatingíveis | **0.4.0-beta**: a stdlib `kof.time` (S7e/S7c) traz `todayIso()`, `formatDateIso(y,m,d)`, `parseDateIso`, `isToday`, `addDays`/`diffDays` — datas absolutas formatadas nos 3 alvos; na lib entraram `clockTime(millis)` (pura, UTC) e `Clock()`/`Spinner(frames,ms)` (vivos, UIW008). O cast `time.now() as Int` continua saturante (regra 6 / Kof4j §181 — truncamento de Long>Int congelado, não gap da lib) |
+| UIW031 | `kof.io` no alvo JS (FilePicker não carregava no browser) | **16/09**: o KofJS delega `readText`/`writeText`/`exists`/`size`/`readFile`/`writeFile` ao host GraalJS (`kof_platform.*`) — round-trip byte-parity com JVM/Native nos 3 alvos; o `FilePicker` carrega no browser agora. Prova: `tests/10-io.kf` "kof.io round-trip existe nos 3 alvos" |
 
 ## Ainda abertos
 
@@ -35,7 +36,6 @@ com código de gap — nunca fingido na API.
 | UIW003 | theming configurável pós-criação | trocar tema global sem recriar janela | `w.theme = Theme.dark()` na criação; `useDarkTheme` + `CurrentTheme` |
 | UIW005 | drag-and-drop (pointer events) | kanban, reorder, sliders arrastáveis | botões ± como controles |
 | UIW006 | seleção múltipla de arquivos / file dialog nativo | upload real | FilePicker por caminho (kof.io) |
-| UIW031 | kof.io no alvo JS | FilePicker carregar no browser | funciona JVM/Native; JS reporta no preview |
 
 ## Suíte headless (pós UIW050/051/052)
 

@@ -26,5 +26,17 @@ test "FilePicker constrói" {
     w.bind(fp.root())
 }
 
+// UIW031 (16/09): kof.io no alvo JS. O round-trip write→exists→size→read
+// roda byte-parity nos 3 alvos (o JS delega ao host GraalJS). Caminho
+// absoluto fixo: writeText sobrescreve, então o estado pós-write é
+// determinístico independentemente de corrida entre alvos.
+test "kof.io round-trip existe nos 3 alvos" {
+    var p = Path("/tmp/kof-uiw031-pick.txt")
+    p.writeText("dados")
+    assert(p.exists() == true, "exists após write")
+    assert(p.size() == 5, "size conta os bytes")
+    assert(p.readText() == "dados", "read devolve o que foi escrito")
+}
+
 main() {
 }
