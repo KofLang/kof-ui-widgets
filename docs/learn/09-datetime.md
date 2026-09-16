@@ -53,9 +53,12 @@ timeLabel(): String                       // "09:15" zero-empilhado
 
 Passos de +1h e +15min com wrap de 24h/60min via `wrapNext`.
 
-## O que ficou de fora e por quê
+## O que mudou (UIW020 fechado 15/09)
 
-Relógio ao vivo precisa de `now()` (Long) convertido para campos — a
-plataforma não tem conversão Long→Int nem formatação de tempo
-([gaps.md](../gaps.md), UIW020). Fuso horário, locale e DST: idem.
-Quando entrarem, entram como funções puras testáveis primeiro.
+A stdlib `kof.time` ganhou `todayIso()`, `formatDateIso(y,m,d)`,
+`parseDateIso` e `addDays`/`diffDays` — datas absolutas nos 3 alvos. Com o
+timer do UIW008, um relógio ao vivo (`"agora: " + time.now()`, que concatena
+direto em Str) deixou de ser gap de plataforma: é widget da lib, e quando
+entrar entra como transição pura testável primeiro. Fuso: `time.tzOffsetSeconds()`
+existe em JVM/JS (native = gap honesto TIME003 da plataforma). DST e locale
+seguem fora.

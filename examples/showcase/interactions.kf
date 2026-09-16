@@ -26,7 +26,8 @@ InteractionGallery(): View {
             Wrap(listOf(Button("Mensagem", () -> { MessageDialog("Olá", "Seu trabalho foi salvo.") }),
                 Button("Confirmar", () -> { Confirm("Confirmação", "Deseja continuar?") }),
                 Button("Drawer", () -> { Drawer("Menu", Text("Conteúdo lateral") as Int) }),
-                Button("Toast", () -> { Toast("Tudo pronto") }))),
+                Button("Toast", () -> { Toast("Tudo pronto") }),
+                Button("Toast auto", () -> { ToastAutoDismiss("some sozinho em 1,2s", 1200) }))),
             Tooltip("O que é Kof?", "Uma linguagem com primitivas de UI.").root()
         ))
     ))

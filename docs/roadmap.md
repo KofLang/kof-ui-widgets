@@ -16,6 +16,8 @@ dia, mantendo a assinatura já prevista aqui.
 | UIW040 (case) | iniciais em caixa alta (`avatarInitials`) |
 | UIW050/UIW051 (regressões JVM/JS) | suíte headless verde nos 3 alvos |
 | UIW052 (assert falso no JS) | `assert` falha corretamente em `--target js` |
+| UIW008 (timer no JS) | `time.interval`/`scheduler.every` + `cancel` nos 4 alvos (TIME001 fechado na plataforma 15/09); `ToastAutoDismiss(message, ms)` entrega o auto-dismiss (Spinner/Skeleton animados: agora é trabalho da lib, não gap de plataforma — trava só no self-cancel §253, contornado com handle-sombra) |
+| UIW020 (formatação de tempo) | `todayIso`/`formatDateIso`/`parseDateIso`/`addDays`/`diffDays` na stdlib; `Str` + `time.now()` concatenable → relógio ao vivo viável com o timer do UIW008 |
 | — | primitivas visuais: `Elevate`/`Outline` (setShadow/setBorder) |
 
 ## Próximos (dependentes de mecanismo)
@@ -26,8 +28,6 @@ dia, mantendo a assinatura já prevista aqui.
 | UIW003 (theming pós-criação) | troca de tema global sem recriar janelas |
 | UIW005 (drag-and-drop) | Kanban, reorder de listas, Slider arrastável |
 | UIW006 (file dialog) | upload real |
-| UIW008 (timer no JS) | Toast auto-dismiss, Spinner/Skeleton animados |
-| UIW020 (formatação de tempo) | Clock vivo, datas absolutas |
 | UIW031 (kof.io no JS) | FilePicker no browser |
 
 ## Versionamento

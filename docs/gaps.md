@@ -24,6 +24,8 @@ com código de gap — nunca fingido na API.
 | UIW050 | handle de UI/mídia apagado para `int` no bytecode era tratado como referência → `VerifyError: Bad type on operand stack` quando uma função top-level devolvia `Label`/`Window`/`View` | 0.4.0-beta (commit `45a2caf5`): `JvmTypeMapper`/`JvmOpEmitter` reconhecem handle apagado para `int` (primitive-vs-referência, comparações/hash de record, `areturn`). `mk(String s): Label { return Label(s) }` roda em `--target jvm` |
 | UIW051 | no runner headless JS o stub de DOM não tinha `dataset`/`setAttribute`/`classList` nem `fillText`/`measureText` no contexto 2D → `setFont`, `setName`/`setReadonly` e texto no Canvas lançavam `TypeError` | 0.4.0-beta: o stub headless cobre os primitivos usados pela biblioteca; `Label("x").setFont(...)`, `Input.setName/setReadonly` e `Canvas.fillText/measureText` rodam em `--target js` |
 | UIW052 | no JS um `Bool` é `true`/`false` real, mas o teste de "falso" do `assert` emitia `(cond === 0)` — sempre `false` → **um assert falso PASSAVA** (escondia falha de teste) | `beta-0.4.0` (`JsComparisons`, §186): `EQ 0` → `!left` (contraparte do `NE 0` → truthiness). Um `assert(1 == 2)` agora falha corretamente em `--target js` |
+| UIW008 | timer só na JVM (`time.*` reportava TIME001 fora dela — e é onde não há render) | **0.4.0-beta / 15/09**: `TIME001` fechado na plataforma nos 4 alvos — `time.interval`/`scheduler.every` + `cancel` rodam no browser (via `setInterval` real) e no headless (fila cooperativa bombeada por `time.sleep`). Nasce `ToastAutoDismiss(message, ms)`. Ressalva honesta: o idiom canônico de self-cancel `var id = time.interval(…, () -> { time.cancel(id) })` ainda trava (Kof4j **§253** — SEM011 na var do próprio interval; SIGSEGV no native ao lê-la dentro do job); a lib cancela via **handle-sombra** (o job lê uma Str capturada comum, verde nos 3 alvos) — ver `06-overlays` |
+| UIW020 | `time.now()` Long sem conversão Long→Int nem formatação; datas absolutas inatingíveis | **0.4.0-beta**: a stdlib `kof.time` (S7e/S7c) traz `todayIso()`, `formatDateIso(y,m,d)`, `parseDateIso`, `isToday`, `addDays`/`diffDays` — datas absolutas formatadas nos 3 alvos; `time.now()` (Long) concatena em `Str` direto (`"t=" + time.now()`), o que habilita relógio ao vivo com o timer do UIW008. O cast `time.now() as Int` continua saturante (regra 6 / Kof4j §181 — truncamento de Long>Inté congelado, não gap da lib) |
 
 ## Ainda abertos
 
@@ -33,8 +35,6 @@ com código de gap — nunca fingido na API.
 | UIW003 | theming configurável pós-criação | trocar tema global sem recriar janela | `w.theme = Theme.dark()` na criação; `useDarkTheme` + `CurrentTheme` |
 | UIW005 | drag-and-drop (pointer events) | kanban, reorder, sliders arrastáveis | botões ± como controles |
 | UIW006 | seleção múltipla de arquivos / file dialog nativo | upload real | FilePicker por caminho (kof.io) |
-| UIW008 | timer só na JVM (`time.*` reporta TIME001 fora dela — e é onde não há render) | animar a UI no alvo JS | ✕ manual no JS; interval disponível para lógica JVM headless |
-| UIW020 | `time.now()` Long sem conversão Long→Int nem formatação | relógio ao vivo, datas absolutas | Calendar/DatePicker relativos e puros (`time.dayOfWeek/daysInMonth/isLeapYear`) |
 | UIW031 | kof.io no alvo JS | FilePicker carregar no browser | funciona JVM/Native; JS reporta no preview |
 
 ## Suíte headless (pós UIW050/051/052)

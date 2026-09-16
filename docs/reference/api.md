@@ -93,13 +93,14 @@ valores. `Int` de widget atravessa funções livremente; operações de membro
 
 | Assinatura | Devolve |
 |------------|---------|
-| `Dialog(title, content: Int)` | Int (Window mostrada) |
-| `MessageDialog(title, message)` | Int |
+| `Dialog(title, content: Int)` | Window (mostrada) |
+| `MessageDialog(title, message)` | Window |
 | `Confirm(title, question)` / `confirmAnswered()` | ConfirmParts / Bool |
 | `Drawer(title, content: Int)` | DrawerParts |
 | `Tooltip(term, explanation)` | TooltipParts (gatilho no fluxo) |
-| `Toast(message)` | Int |
-| `Alert(kind: "ok"\|"info"\|"warn"\|"error", message)` | Int (banner inline) |
+| `Toast(message)` | Window (com ✕) |
+| `ToastAutoDismiss(message, ms)` | Window (some sozinha; UIW008) |
+| `Alert(kind: "ok"\|"info"\|"warn"\|"error", message)` | View (banner inline) |
 | `alertGlyph(kind) / alertColor(kind)` | String / Int (puras) |
 
 ## 07-data

@@ -28,5 +28,29 @@ test "overlays constroem (janelas no-op em JVM)" {
     Toast("salvo com sucesso")
 }
 
+test "one-shot cancela sozinho via handle-sombra" {
+    // Padrão do §253: o job lê myId (Str capturada comum), nunca a var do
+    // proprio time.interval — cancel-by-id real nos 3 alvos.
+    var fired = 0
+    var myId = ""
+    var id = time.interval(10, () -> {
+        if (fired == 0 && myId.length > 0) {
+            fired = 1
+            time.cancel(myId)
+        }
+    })
+    myId = id
+    time.sleep(90)
+    var before = fired
+    time.sleep(90)
+    assert(before >= 1, "disparou: " + str(before))
+    assert(fired == before, "se cancelou: " + str(fired))
+}
+
+test "ToastAutoDismiss constrói (janela no-op em JVM/Native)" {
+    var w = ToastAutoDismiss("salvo", 30)
+    assert(true, "construiu sem lançar")
+}
+
 main() {
 }

@@ -7,7 +7,9 @@
 // Decisões de design:
 //   - Dialog/Drawer/Toast se mostram sozinhos ("mostre isto" é a intenção).
 //   - Tooltip cria a janela OCULTA na construção; o clique é que mostra.
-//   - Sem timer na plataforma: toast tem ✕ em vez de sumir sozinho.
+//   - Timer existe no mecanismo (UIW008 fechado 15/09): ToastAutoDismiss
+//     some sozinho e se cancela via handle-sombra (o job nunca lê a var do
+//     próprio interval — Kof4j §253).
 
 class ConfirmState {
     static Bool answered = false
@@ -125,6 +127,33 @@ Toast(String message): Window {
     var layout = Column(listOf(bxh, sp8b, cbh))
     w.bind(layout)
     w.show()
+    var wh = w
+    return wh
+}
+
+// Toast que some sozinho após `ms` (UIW008 fechado pelo timer da
+// plataforma). O cancel usa um HANDLE SOMBRA: o job lê `myId` (uma Str
+// capturada comum — verde nos 3 alvos) em vez da var `id` que recebe o
+// próprio time.interval, porque ler ESSA var dentro do job SIGSEGVa no
+// native x86 (Kof4j §253 face B) e `time.cancel(id)` na mesma frase nem
+// compila (face A, SEM011). A atribuição `myId = id` acontece no corpo
+// síncrono, antes do primeiro tick (ms >= 1). ms <= 0 fecha na hora.
+ToastAutoDismiss(String message, Int ms): Window {
+    var w = Toast(message)
+    if (ms <= 0) {
+        w.close()
+        return w
+    }
+    var fired = 0
+    var myId = ""
+    var id = time.interval(ms, () -> {
+        if (fired == 0 && myId.length > 0) {
+            fired = 1
+            time.cancel(myId)
+            w.close()
+        }
+    })
+    myId = id
     var wh = w
     return wh
 }

@@ -56,11 +56,16 @@ a alternativa acessível.
 ## Toast
 
 ```kof
-Toast(String message): Int
+Toast(String message): Window               // ✕ manual
+ToastAutoDismiss(String message, Int ms): Window   // some sozinho após ms
 ```
 
-Pílula colorida em mini-janela com ✕. Sem timer na plataforma: o toast não
-some sozinho (gap documentado) — quem fecha é o usuário.
+Pílula colorida em mini-janela. `Toast` fecha no ✕; `ToastAutoDismiss` usa
+o timer da plataforma (UIW008 fechado 15/09) e fecha a janela em `ms`. A
+auto-cancelação lê um **handle-sombra**, não a var do próprio
+`time.interval` — o idiom canônico `time.cancel(id)` dentro do job ainda
+trava na plataforma (Kof4j §253), e a lib documenta a armadilha no fonte.
+Em `ms <= 0` fecha na hora, sem timer.
 
 ## Alert / Banner inline
 
