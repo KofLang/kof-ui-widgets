@@ -10,7 +10,12 @@ os alvos; quem não consegue executá-la diz isso na hora.**
 | **Native** | handles no-ops — idem JVM | `--target=native` |
 
 `FilePicker` depende de kof.io — que roda nos 3 alvos (o JS delega ao host
-GraalJS, byte-parity; UIW031 fechado 16/09).
+GraalJS, byte-parity; UIW031 fechado 16/09). **Recorte honesto:** a delegação
+exige o runner com host (`kof run --target=js`); no browser puro
+(desenvolvimento web sem host GraalJS) `kof.io` lança erro claro — "not
+available in the browser" — nunca leitura silenciosa. FilePicker no browser
+precisaria de `input[type=file]` no runtime; continua aberto como gap de
+plataforma (Kof4j, sem código — a UI do widget já funciona).
 
 Consequências práticas:
 

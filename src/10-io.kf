@@ -3,7 +3,10 @@
  // Combina Input (caminho) + botão carregar + preview via kof.io.
  // kof.io roda nos 3 alvos (JVM/Native/JS — o JS delega para o host
  // GraalJS, `kof_platform.readText/writeText/exists/size`, byte-parity com
- // JVM/Native; UIW031 fechado 16/09).
+ // JVM/Native; UIW031 fechado 16/09). Recorte honesto: exige o runner com
+ // host (`--target=js`); no browser puro `kof.io` lança "not available in
+ // the browser" — um FilePicker de verdade no browser precisa de
+ // input[type=file] no runtime (gap de plataforma, sem código aqui).
 
 class FilePickerState {
     static String loadedPath = ""
