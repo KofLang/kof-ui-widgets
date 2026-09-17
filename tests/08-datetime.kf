@@ -81,5 +81,40 @@ test "Clock e Spinner constroem (no-op em JVM/Native)" {
     assert(s.text().length == 0 || s.text().length == 1, "quadro: " + s.text())
 }
 
+test "skeletonShimmer valores exatos (transição pura)" {
+    assert(skeletonShimmer(0, 4) == "▓░░░", "fase 0")
+    assert(skeletonShimmer(1, 4) == "░▓░░", "fase 1")
+    assert(skeletonShimmer(3, 4) == "░░░▓", "fase 3 = ultima pos")
+    assert(skeletonShimmer(4, 4) == "▓░░░", "wrap: 4%4=0")
+    assert(skeletonShimmer(7, 4) == "░░░▓", "wrap: 7%4=3")
+    assert(skeletonShimmer(0, 1) == "▓", "largura 1")
+    assert(skeletonShimmer(5, 0) == "", "largura 0 invisivel")
+    assert(skeletonShimmer(0, -2) == "", "largura negativa")
+}
+
+test "skeletonShimmer largura impar + varredura completa" {
+    assert(skeletonShimmer(0, 5) == "▓░░░░", "5 wide fase 0")
+    assert(skeletonShimmer(2, 5) == "░░▓░░", "5 wide meio")
+    assert(skeletonShimmer(4, 5) == "░░░░▓", "5 wide fim")
+    assert(skeletonShimmer(5, 5) == "▓░░░░", "5 wide wrap")
+}
+
+test "Skeleton constrói + barra viva no JS (no-op em JVM/Native)" {
+    var s = Skeleton(3, 6, 10)
+    time.sleep(40)
+    // construída = 3 barras de largura 6, cada uma exatamente 6 chars no JS
+    // (no-op em JVM/Native: text() vazio).
+    assert(s.bars.size == 3, "3 barras: " + s.bars.size)
+    var b0 = s.bars.get(0).text()
+    var b1 = s.bars.get(1).text()
+    assert(b0 == "" || b0.length == 6, "barra 0: '" + b0 + "' (len " + b0.length + ")")
+    // onda diagonal ao DOM: em JS as 3 barras têm FASE deslocada (width 6 >
+    // rows 3), então lidas no mesmo instante são strings DISTINTAS. Prova que
+    // o offset por linha (step + p) chegou no render, não só a construção.
+    if (b0.length == 6) {
+        assert(b0 != b1, "fases deslocadas: b0='" + b0 + "' b1='" + b1 + "'")
+    }
+}
+
 main() {
 }

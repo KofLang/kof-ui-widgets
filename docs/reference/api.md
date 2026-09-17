@@ -138,7 +138,9 @@ O calendário civil vem de `kof.time` (`dayOfWeek` ISO convertido para
 | `timeLabel()` | String ("09:15") |
 | `clockTime(millis: Long)` | String ("HH:MM:SS", pura, UTC) |
 | `spinnerFrame(step: Int)` | String (braille, wrap 8, pura) |
+| `skeletonShimmer(step: Int, width: Int)` | String (`▓` varrendo `░`, wrap em `width`, pura) |
 | `Clock()` / `Spinner(frames, ms)` | Label (vivos — UIW008; Spinner se cancela, Clock não) |
+| `Skeleton(rows, width, ms)` | SkeletonParts `.root()`/`.bars` (vivo — placeholder de carregamento com onda diagonal; sem cancel, vive com o widget) |
 
 ## 09-charts
 

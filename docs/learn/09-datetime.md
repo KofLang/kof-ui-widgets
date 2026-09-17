@@ -60,6 +60,8 @@ Clock(): Label                       // "YYYY-MM-DD HH:MM:SS", atualiza a cada 1
 Spinner(frames, ms): Label           // ⠋⠙⠹… anima `frames` passos de `ms` e para
 clockTime(millis: Long): String      // pura — "HH:MM:SS"
 spinnerFrame(step: Int): String      // pura — quadro de `step` (wrap 8)
+Skeleton(rows, width, ms): SkeletonParts   // placeholder com onda `▓` sobre `░`
+skeletonShimmer(step: Int, width: Int): String  // pura — barra de `step` (wrap width)
 ```
 
 Ambos usam o timer do `time.interval` (UIW008). `Clock` compõe `todayIso()`
@@ -68,6 +70,14 @@ da stdlib com `clockTime(time.now())` e roda a vida do app; `Spinner` anima e
 `time.interval` — o self-cancel canônico trava no Kof4j §253). Em JVM/Native
 o `setText` é no-op; a prova dos valores é a transição pura, travada em
 âncoras absolutas (não no relógio do host).
+
+`Skeleton` fecha a linha "pendente de design" do roadmap: `rows` barras de
+`width` células em um `View` de superfície; a cada `ms` um brilho `▓` varre
+cada barra, defasado de `step + p` por linha — onda diagonal. Vive com o
+widget (interval sem cancel, como o `Clock`; o §253 não é tocado). `ms <= 0`
+congela a fase de construção; `rows <= 0` dá caixa vazia. O `.bars` do
+`SkeletonParts` expõe as `Label`s (mesmo shape do `ReorderList`), então o
+chamado pode esconder/mostrar sem recompôr.
 
 Fuso: `time.tzOffsetSeconds()` existe em JVM/JS (native = gap honesto
 TIME003 da plataforma). DST e locale seguem fora. Nota de casa: o

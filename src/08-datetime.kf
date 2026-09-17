@@ -252,3 +252,59 @@ Spinner(Int frames, Int ms): Label {
     var vh = view
     return vh
 }
+
+// ---- Skeleton animado (rodada no roadmap: "pendente de design") ----------------------
+//
+// Placeholder de carregamento: `rows` barras na largura `width`, com um
+// brilho `▓` varrendo cada barra a cada `ms` — a linha i defasada de i
+// (onda diagonal). Design fechado reusando só o que a casa já provou:
+// transição PURA travada por valor exato (spinneFrame; sem Date, sem
+// handle — determinística em qualquer alvo) + o timer do UIW008 no mesmo
+// padrão do Clock (interval sem cancel: o job vive com o widget; a
+// hangprobe mediu que jobs recorrentes sem cancel NÃO impedem o processo
+// de encerrar em nenhum alvo — e evita de propósito o self-cancel do
+// §253, que trava no native). Em JVM/Native o setText é no-op (sem
+// render) — a prova é a transição pura nos 3 alvos.
+//
+// O job do interval roda um `while` sobre as barras — forma que já foi
+// a armadilha do §266 (loop com corpo grande no reconstructor JS); agora
+// verte com o marcador estrutural, e este widget é prova de vida a mais.
+
+// barra da skeleton no passo `step` e largura `width`: `▓` na posição
+// step % width, `░` no resto. width <= 0 => "" (linha invisível).
+skeletonShimmer(Int step, Int width): String {
+    if (width <= 0) {
+        return ""
+    }
+    var pos = step % width
+    return repeat("░", pos) + "▓" + repeat("░", width - pos - 1)
+}
+
+record SkeletonParts(View root, List<Label> bars)
+
+// Skeleton viva: `rows` barras de largura `width`, varredura a cada `ms`.
+// rows <= 0 => caixa vazia; ms <= 0 => brilho parado na fase de construção
+// (linha i mostra skeletonShimmer(i, width)).
+Skeleton(Int rows, Int width, Int ms): SkeletonParts {
+    var bars = new List<Label>()
+    var i = 0
+    while (i < rows) {
+        bars.add(Label(skeletonShimmer(i, width)))
+        i = i + 1
+    }
+    var box = View(Style(SurfaceColor(), MutedColor(), 12, 8))
+    box.bind(Column(bars))
+    var step = 0
+    if (rows > 0 && ms > 0) {
+        time.interval(ms, () -> {
+            step = step + 1
+            var p = 0
+            while (p < bars.size) {
+                bars.get(p).setText(skeletonShimmer(step + p, width))
+                p = p + 1
+            }
+        })
+    }
+    var parts = SkeletonParts(box, bars)
+    return parts
+}
