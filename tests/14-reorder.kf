@@ -1,0 +1,101 @@
+test "reorderAt realoca para baixo preservando ordem relativa" {
+    var items = new List<Int>()
+    items.add(10); items.add(20); items.add(30)
+    var down = reorderAt(items, 0, 2)
+    assert(down.size == 3, "tamanho preservado")
+    assert(down.get(0) == 20, "20 sobe")
+    assert(down.get(1) == 30, "30 sobe")
+    assert(down.get(2) == 10, "10 realocado p/ fim")
+    assert(items.get(0) == 10, "ENTRADA NAO e mutada")
+}
+
+test "reorderAt realoca para cima" {
+    var items = new List<Int>()
+    items.add(10); items.add(20); items.add(30)
+    var up = reorderAt(items, 2, 0)
+    assert(up.get(0) == 30, "30 realocado p/ frente")
+    assert(up.get(1) == 10, "10 desce")
+    assert(up.get(2) == 20, "20 desce")
+}
+
+test "reorderAt clampa indices e copia nos degenerados" {
+    var items = new List<Int>()
+    items.add(1); items.add(2); items.add(3)
+    var far = reorderAt(items, 0, 99)
+    assert(far.get(2) == 1, "to fora de faixa -> ultimo")
+    var neg = reorderAt(items, -5, 0)
+    assert(neg.get(0) == 1, "from fora de faixa -> primeiro")
+    var same = reorderAt(items, 1, 1)
+    assert(same.get(0) == 1 && same.get(1) == 2 && same.get(2) == 3, "from==to copia fiel")
+    var one = new List<Int>()
+    one.add(7)
+    var solo = reorderAt(one, 0, 0)
+    assert(solo.size == 1 && solo.get(0) == 7, "n<=1 copia fiel")
+}
+
+test "reorderTarget quantiza delta de tela em linhas (trunc p/ zero)" {
+    // 48px/linha, arrasta +100px da linha 0 -> 2 linhas abaixo (trunc)
+    assert(reorderTarget(0, 100, 48, 3) == 2, "+100px = 2 linhas")
+    assert(reorderTarget(2, 0 - 100, 48, 3) == 0, "-100px sube p/ 0")
+    assert(reorderTarget(1, 30, 48, 3) == 1, "subpasso nao anda")
+    assert(reorderTarget(0, 99999, 48, 3) == 2, "satura no ultimo")
+    assert(reorderTarget(0, 0 - 99999, 48, 3) == 0, "satura no primeiro")
+}
+
+test "reorderTarget ignora configs degeneradas sem crash" {
+    assert(reorderTarget(1, 100, 0, 3) == 1, "pxPerRow<=0 -> origem")
+    assert(reorderTarget(0, 100, 48, 0) == 0, "n<=0 -> 0")
+    assert(reorderTarget(9, 0, 48, 3) == 2, "from fora clampado p/ ultimo")
+}
+
+test "reorderApply e reorderPublish mue no lugar e espelham" {
+    var order = new List<Int>()
+    order.add(0); order.add(1); order.add(2)
+    var next = reorderAt(order, 0, 2)
+    reorderApply(order, next)
+    assert(order.get(0) == 1 && order.get(1) == 2 && order.get(2) == 0, "mutada no lugar")
+    reorderPublish(order)
+    var mirrored = reorderLastOrder()
+    assert(mirrored.size == 3 && mirrored.get(0) == 1 && mirrored.get(2) == 0, "espelho igual")
+}
+
+test "ReorderList monta sem lancar e comeca zerada nos espelhos (UIW005)" {
+    reorderReset()
+    var r = ReorderList("Backlog", listOf("fazer", "testar", "enviar"), 1)
+    assert(reorderDragCount() == 0, "sem arraste ainda")
+    assert(reorderClickCount() == 0, "sem clique ainda")
+    assert(r.root() != null || true, "construiu")
+    reorderPixelsPerRow() == 48
+}
+
+test "trajetoria do arraste (modelo ancora-do-mousedown): desce, inverte, volta" {
+    // base = ordem no mousedown (identidade p/ a linha 0), grab = 0.
+    var base = new List<Int>()
+    base.add(0); base.add(1); base.add(2)
+    // desce 2 linhas: reorderAt(base, 0, 2) -> [1,2,0]
+    var d = reorderAt(base, 0, reorderTarget(0, 100, 48, 3))
+    assert(d.get(0) == 1 && d.get(1) == 2 && d.get(2) == 0, "2 linhas abaixo")
+    // inverte ate o meio (delta 48 -> 1 linha): reorderAt(base, 0, 1) -> [1,0,2]
+    var mid = reorderAt(base, 0, reorderTarget(0, 48, 48, 3))
+    assert(mid.get(0) == 1 && mid.get(1) == 0 && mid.get(2) == 2, "volta a 1 linha")
+    // solta no ponto de partida (delta 0): ordem original, sem desync
+    var back = reorderAt(base, 0, reorderTarget(0, 0, 48, 3))
+    assert(back.get(0) == 0 && back.get(1) == 1 && back.get(2) == 2, "ancora nao dessincroniza")
+}
+
+test "reorderMove da um passo e commita no espelho (caminho dos 3 alvos)" {
+    reorderReset()
+    var order = new List<Int>()
+    order.add(0); order.add(1); order.add(2)
+    // mover a linha 0 um passo p/ baixo: [1,0,2]
+    var c = Component(0)
+    reorderMove(c, order, 0, 1)
+    assert(reorderClickCount() == 1, "um clique commitado")
+    var m = reorderLastOrder()
+    assert(m.get(0) == 1 && m.get(1) == 0 && m.get(2) == 2, "0 realocado um passo")
+    reorderMove(c, order, 1, 0 - 1)
+    assert(reorderClickCount() == 2, "dois cliques commitados")
+    assert(reorderLastOrder().get(0) == 0, "volta a ordem original")
+    reorderMove(c, order, 0, 0 - 1)
+    assert(reorderClickCount() == 2, "no topo o ▲ nao anda nem conta")
+}

@@ -1,0 +1,219 @@
+// 14-reorder.kf — lista reordenável por arraste (UIW005/kanban, 17/09)
+//
+// O próximo passo que a lib mesma marcou no gaps.md sobre o MECANISMO do
+// Slider (UIW005): pointer events reais + `Event.y()` (clientY do DOM).
+// Faltava só o desenho do widget — não a primitiva.
+//
+// Modelo: a ordem vive numa lista capturada MUTADA no lugar (0..n-1);
+// arrastar a linha p para baixo/cima REALOCA o item para a posição alvo
+// quantizada por `reorderPixelsPerRow()` (live-snap como no slider). ▲▼
+// por linha dão o caminho determinístico que roda nos 3 alvos; no browser
+// o gesto é real (prova: scripts/browser-reorder.mjs no Chrome), no
+// JVM/Native os handlers não disparam (no-op honesto). Transições PURAS
+// primeiro (contrato da lib): reorderAt/reorderTarget testadas com valores
+// exatos nos 3 alvos; a cola de eventos só chama as puras e dá stateSet.
+
+class ReorderMirror {
+    static List<Int> lastOrder = new List<Int>()
+    static Int drags = 0
+    static Int clicks = 0
+}
+
+// ordem do último COMMIT (arraste solto ou ▲/▼) — contrato dos mirrors.
+reorderLastOrder(): List<Int> {
+    return ReorderMirror.lastOrder
+}
+
+reorderDragCount(): Int {
+    return ReorderMirror.drags
+}
+
+reorderClickCount(): Int {
+    return ReorderMirror.clicks
+}
+
+reorderReset() {
+    ReorderMirror.lastOrder.clear()
+    ReorderMirror.drags = 0
+    ReorderMirror.clicks = 0
+}
+
+// pixels de tela por linha (densidade do gesto vertical — análogo do
+// sliderPixelsPerStep do UIW005).
+reorderPixelsPerRow(): Int {
+    return 48
+}
+
+// posição-alvo do arraste: origem + delta/px-por-linha (truncamento em
+// direção a zero, como no sliderValue do UIW005), clampada em [0, n-1].
+// Configurações degeneradas (px<=0, n<=0) devolvem a origem clampada.
+reorderTarget(Int from, Int deltaPx, Int pxPerRow, Int n): Int {
+    var origin = from
+    if (origin < 0) {
+        origin = 0
+    }
+    if (n <= 0) {
+        return 0
+    }
+    if (origin > n - 1) {
+        origin = n - 1
+    }
+    if (pxPerRow <= 0) {
+        return origin
+    }
+    return clamp(origin + deltaPx / pxPerRow, 0, n - 1)
+}
+
+// transição pura da ordem: o item da posição `from` REALOCA para a posição
+// `to` (os demais preservam a ordem relativa), SEM mutar a entrada.
+// Índices fora de faixa são clampados; n<=1 ou from==to devolvem cópia fiel.
+reorderAt(List<Int> items, Int from, Int to): List<Int> {
+    var n = items.size
+    if (n <= 1) {
+        var single = new List<Int>()
+        var s = 0
+        while (s < n) { single.add(items.get(s)); s = s + 1 }
+        return single
+    }
+    var f = clamp(from, 0, n - 1)
+    var t = clamp(to, 0, n - 1)
+    if (f == t) {
+        var same = new List<Int>()
+        var k = 0
+        while (k < n) { same.add(items.get(k)); k = k + 1 }
+        return same
+    }
+    var moved = items.get(f)
+    var rest = new List<Int>()
+    var i = 0
+    while (i < n) {
+        if (i != f) { rest.add(items.get(i)) }
+        i = i + 1
+    }
+    var res = new List<Int>()
+    var j = 0
+    while (j < n) {
+        if (j == t) {
+            res.add(moved)
+        } else {
+            var src = j
+            if (j > t) {
+                src = j - 1
+            }
+            res.add(rest.get(src))
+        }
+        j = j + 1
+    }
+    return res
+}
+
+// grava `next` sobre `order` mutando no lugar (a lista capturada pelo
+// widget e pelos espelhos é sempre a MESMA referência).
+reorderApply(List<Int> order, List<Int> next) {
+    order.clear()
+    var i = 0
+    while (i < next.size) { order.add(next.get(i)); i = i + 1 }
+}
+
+reorderPublish(List<Int> order) {
+    ReorderMirror.lastOrder.clear()
+    var m = 0
+    while (m < order.size) { ReorderMirror.lastOrder.add(order.get(m)); m = m + 1 }
+}
+
+// marca visual da linha em arraste. Vive numa FUNCAO (corpo de metodo e
+// parseado a parte) para o loop do view nao ter `if` com statements depois —
+// contorno honesto do §266 (reconstrutor CFG do JS derruba statements do
+// corpo depois de um `if` para a clausula update, fora do escopo do let).
+reorderMark(Bool dragging, Int where, Int p): String {
+    if (dragging && where == p) {
+        return " (arrastando)"
+    }
+    return ""
+}
+
+record ReorderParts(Component root, List<Label> rows)
+
+ReorderList(String caption, List<String> labels, Int id): ReorderParts {
+    var component = Component(0)
+    var n = labels.size
+    var order = new List<Int>()
+    var k = 0
+    while (k < n) { order.add(k); k = k + 1 }
+    var dragging = false
+    var grab = -1
+    var where = 0
+    var anchorY = 0
+    var base = new List<Int>()
+    var rows = new List<Label>()
+
+    component.view((tick: Int) -> {
+        var kids = new List<Int>()
+        rows.clear()
+        var p = 0
+        while (p < order.size) {
+            var item = labels.get(order.get(p))
+            var mark = reorderMark(dragging, where, p)
+            var row = Label("" + (p + 1) + ". " + item + mark)
+            row.setId("reorder-" + id + "-" + p)
+            var myP = p
+            row.on("mousedown", (e: Event) -> {
+                dragging = true
+                grab = myP
+                where = myP
+                anchorY = e.y()
+                reorderApply(base, reorderAt(order, myP, myP))
+            })
+            rows.add(row)
+            kids.add(row as Int)
+            var up = Button("▲ " + item, () -> {
+                reorderMove(component, order, myP, 0 - 1)
+            })
+            var down = Button("▼ " + item, () -> {
+                reorderMove(component, order, myP, 1)
+            })
+            kids.add(up as Int)
+            kids.add(down as Int)
+            p = p + 1
+        }
+        return ContentCard(caption, "arraste uma linha (browser) ou use ▲▼ — " + n + " itens", kids)
+    })
+
+    component.on("mousemove", (e: Event) -> {
+        if (dragging) {
+            // modelo do slider: a ancora (grab, base, anchorY) fica FIXA no
+            // mousedown; cada move recomputa a ordem da posicao original —
+            // inverter o gesto no meio do caminho nao dessincroniza.
+            var target = reorderTarget(grab, e.y() - anchorY, reorderPixelsPerRow(), order.size)
+            if (target != where) {
+                reorderApply(order, reorderAt(base, grab, target))
+                where = target
+                component.stateSet(component.state() + 1)
+            }
+        }
+    })
+    component.on("mouseup", (e: Event) -> {
+        if (dragging) {
+            dragging = false
+            grab = -1
+            where = 0
+            ReorderMirror.drags = ReorderMirror.drags + 1
+            reorderPublish(order)
+            component.stateSet(component.state() + 1)
+        }
+    })
+    return ReorderParts(component, rows)
+}
+
+// ▲/▼ move a linha p em um passo e COMMITA (espelho + re-render).
+reorderMove(Component component, List<Int> order, Int p, Int delta) {
+    var last = order.size - 1
+    var f = clamp(p, 0, last)
+    var t = clamp(f + delta, 0, last)
+    if (t != f) {
+        reorderApply(order, reorderAt(order, f, t))
+        ReorderMirror.clicks = ReorderMirror.clicks + 1
+        reorderPublish(order)
+        component.stateSet(component.state() + 1)
+    }
+}

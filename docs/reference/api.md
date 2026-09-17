@@ -187,6 +187,10 @@ O calendário civil vem de `kof.time` (`dayOfWeek` ISO convertido para
 | `Slider(caption, min, max, step, initial)` | Component — arrastável via ponteiro no browser (UIW005, 16/09) |
 | `sliderValue(base, deltaPx, pxPerStep, min, max, step)` | Int (pura — transição do arraste) |
 | `sliderPixelsPerStep()` | Int (4 px por passo) |
+| `ReorderList(caption, labels, id)` | ReorderParts — lista reordenável por arraste no browser (UIW053, 17/09; ▲▼ rodam nos 3 alvos) |
+| `reorderAt(items, from, to)` / `reorderTarget(from, deltaPx, pxPerRow, n)` | List<Int> / Int (puras — transição da ordem) |
+| `reorderPixelsPerRow()` | Int (48 px por linha) |
+| `ReorderMirror.lastOrder` / `reorderLastOrder()` / `reorderDragCount()` / `reorderClickCount()` / `reorderReset()` | espelhos da última ordem/arrastes/cliques |
 | `SliderMirror.lastValue` / `sliderLastValue()` | espelho do último valor arrastado |
 | `CanvasBars(labels, values, color)` | Canvas |
 | `CanvasLine(values, color) / CanvasRing(percent, color)` | Canvas |

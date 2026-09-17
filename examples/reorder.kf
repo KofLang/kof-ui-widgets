@@ -1,0 +1,9 @@
+// ReorderList — o proximo passo do mecanismo do Slider (UIW005) sobre o
+// MESMO primitivo de ponteiro: arraste uma linha para reordenar a lista
+// (kanban-lite). No browser o gesto e real; os botoes ▲▼ movem em qualquer alvo.
+main() {
+    var w = App("ReorderList")
+    var board = ReorderList("Backlog", listOf("escrever docs", "rodar suíte", "submeter PR"), 1)
+    w.bind(board.root())
+    w.show()
+}
