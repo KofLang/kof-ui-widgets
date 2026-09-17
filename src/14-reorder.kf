@@ -121,16 +121,13 @@ reorderPublish(List<Int> order) {
     while (m < order.size) { ReorderMirror.lastOrder.add(order.get(m)); m = m + 1 }
 }
 
-// marca visual da linha em arraste. Vive numa FUNCAO (corpo de metodo e
-// parseado a parte) para o loop do view nao ter `if` com statements depois —
-// contorno honesto do §266 (reconstrutor CFG do JS derruba statements do
-// corpo depois de um `if` para a clausula update, fora do escopo do let).
-reorderMark(Bool dragging, Int where, Int p): String {
-    if (dragging && where == p) {
-        return " (arrastando)"
-    }
-    return ""
-}
+// marca visual da linha em arraste. Kof4j §266 (FECHADO 17/09) fazia este `if`
+// dentro do loop do view miscompilar no JS — os statements posteriores ao `if`
+// caíam na cláusula update do `for(;…;…)` reconstruído, fora do escopo dos
+// próprios `let` (ReferenceError engolido pelo kofUiRender → UI vazia). Com o
+// continue label estrutural do §266 a forma direta é segura nos 4 alvos; a
+// marca é um `if`-sem-else simples (a face §267, if/else dobra-ternária, não é
+// tocada aqui — só um ramo).
 
 record ReorderParts(Component root, List<Label> rows)
 
@@ -153,7 +150,10 @@ ReorderList(String caption, List<String> labels, Int id): ReorderParts {
         var p = 0
         while (p < order.size) {
             var item = labels.get(order.get(p))
-            var mark = reorderMark(dragging, where, p)
+            var mark = ""
+            if (dragging && where == p) {
+                mark = " (arrastando)"
+            }
             var row = Label("" + (p + 1) + ". " + item + mark)
             row.setId("reorder-" + id + "-" + p)
             var myP = p
